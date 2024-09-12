@@ -3,14 +3,15 @@
 namespace RingleSoft\JasminClient\Models;
 
 use Illuminate\Http\Client\Response;
-use RingleSoft\JasminClient\Contracts\JasminHttpContract;
 
-class JasminHttpResponse
+class JasminHttpResponse extends JasminResponse
 {
-
 
     public static function from(Response $response): JasminHttpResponse
     {
-        return new self();
+        $self = new self($response->status(), $response->body(), $response->json());
+        $self->message = $response->body();
+        $self->data = $response->json();
+        return $self;
     }
 }
