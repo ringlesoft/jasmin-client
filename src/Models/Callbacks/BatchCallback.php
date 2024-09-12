@@ -20,6 +20,16 @@ class BatchCallback
         $this->statusText = $statusText;
     }
 
+    public static function rules(): array
+    {
+        return  [
+            'batchId' => ['required', 'string'],
+            'to' => ['required', 'string'],
+            'status' => ['required', 'string'],
+            'statusText' => ['required', 'string'],
+        ];
+    }
+
     public function isSuccessful(): bool
     {
         return (bool) $this->status;
