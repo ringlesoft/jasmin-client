@@ -50,10 +50,10 @@ interface JasminHttpContract
 
     /**
      * @param Request $request
-     * @param callable $callback (HttpDlr $message)
+     * @param callable $callback (DeliveryCallback $deliveryCallback)
      * @return JsonResponse
      */
-    public function receiveDlr(Request $request, callable $callback): JsonResponse;
+    public function receiveDlrCallback(Request $request, callable $callback): JsonResponse;
 
     // Receive MO message
 

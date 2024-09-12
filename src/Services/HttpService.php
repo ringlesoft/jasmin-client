@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use RingleSoft\JasminClient\Contracts\JasminHttpContract;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
+use RingleSoft\JasminClient\Models\Callbacks\DeliveryCallback;
 use RingleSoft\JasminClient\Models\IncomingMessage;
 use RingleSoft\JasminClient\Models\JasminHttpResponse;
 
@@ -138,23 +139,26 @@ class HttpService implements JasminHttpContract
         return new JsonResponse("NACK/Jasmin", 400);
     }
 
-    public function receiveDlr(Request $request, callable $callback): JsonResponse
+    /**
+     * @param Request $request
+     * @param callable $callback(DeliveryCallback $deliveryCallback)
+     * @return JsonResponse
+     */
+    public function receiveDlrCallback(Request $request, callable $callback): JsonResponse
     {
-        $rules = [
 
-        ];
-        $validator = Validator::make($request->input(), $rules);
+        $validator = Validator::make($request->input(), DeliveryCallback::rules());
         if ($validator->fails()) {
             Log::info("Invalid request received from jasmin");
             return new JsonResponse("Invalid Request", 400);
         }
-        $dlr = new HttpDlr(
+        $dlr = new DeliveryCallback(
             id: $request->input('id'),
             smscId: $request->input('smsc-id'),
             messageStatus: $request->input('message-status'),
             level: $request->input('level'),
             connector: $request->input('connector'),
-            submittedDdate: $request->input('subdate'),
+            submittedDate: $request->input('subdate'),
             doneDate: $request->input('donedate'),
             submittedCount: $request->input('sub'),
             deliveredCunt: $request->input('dlvrd'),
