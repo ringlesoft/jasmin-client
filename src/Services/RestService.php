@@ -3,10 +3,16 @@
 namespace RingleSoft\JasminClient\Services;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use RingleSoft\JasminClient\Contracts\JasminRestContract;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
+use RingleSoft\JasminClient\Models\Batch;
+use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
 use RingleSoft\JasminClient\Models\JasminRestResponse;
 
 class RestService implements JasminRestContract
@@ -125,5 +131,29 @@ class RestService implements JasminRestContract
             throw JasminClientException::from($e);
         }
         return JasminRestResponse::from($response);
+    }
+
+    /**
+     * @param Request $request
+     * @param callable $callback(BatchCallback $batchCallback)
+     * @return JsonResponse
+     */
+    public function receiveBatchCallback(Request $request, callable $callback): JsonResponse
+    {
+        $validator = Validator::make($request->input(), BatchCallback::rules());
+        if ($validator->fails()) {
+            Log::info("Invalid request received from jasmin");
+            return new JsonResponse("Invalid Request", 400);
+        }
+        $batchCallback = new BatchCallback(
+            batchId: $request->input('batchId'),
+            to: $request->input('to'),
+            status: $request->input('status'),
+            statusText: $request->input('statusText')
+        );
+        if ($callback($batchCallback)) {
+            return new JsonResponse("ACK/Jasmin", 200);
+        }
+        return new JsonResponse("FAIL/Jasmin", 400);
     }
 }

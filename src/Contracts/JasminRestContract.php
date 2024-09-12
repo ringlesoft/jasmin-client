@@ -2,6 +2,8 @@
 
 namespace RingleSoft\JasminClient\Contracts;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\JasminRestResponse;
 
@@ -54,6 +56,13 @@ interface JasminRestContract
      * @return JasminRestResponse
      */
     public function ping(): JasminRestResponse;
+
+    /**
+     * @param Request $request
+     * @param callable $callback(BatchCallback $batchCallback)
+     * @return JsonResponse
+     */
+    public function receiveBatchCallback(Request $request, callable $callback): JsonResponse;
 
 
 }
