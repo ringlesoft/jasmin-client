@@ -1,0 +1,47 @@
+{
+    "name": "ringle/jasmin-client",
+    "description": "A laravel package for interacting with Jasmin SMS Gateway",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "keywords": [
+        "ringlesoft",
+        "jasmin",
+        "sms",
+        "smpp",
+        "sms gateway",
+        "laravel"
+    ],
+    "autoload": {
+        "psr-4": {
+            "RingleSoft\\JasminClient\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "David Ringle",
+            "email": "ringunger@gmail.com",
+            "homepage": "https://ringlesoft.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "illuminate/collections": "^11.23"
+    }
+    ,
+    "require-dev": {
+        "roave/security-advisories": "dev-latest"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "RingleSoft\\JasminClient\\JasminClientServiceProvider"
+            ],
+            "aliases": {
+                "LaravelSelectable": "Ringlesoft\\JasminClient\\Facades\\JasminClient"
+            },
+            "dont-discover": [
+            ]
+        }
+    }
+}
