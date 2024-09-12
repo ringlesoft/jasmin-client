@@ -2,7 +2,18 @@
 
 namespace RingleSoft\JasminClient\Services;
 
+use HttpDlr;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use RingleSoft\JasminClient\Contracts\JasminHttpContract;
+use RingleSoft\JasminClient\Exceptions\JasminClientException;
+use RingleSoft\JasminClient\Models\IncomingMessage;
 use RingleSoft\JasminClient\Models\JasminHttpResponse;
 
 class HttpService implements JasminHttpContract
@@ -10,16 +21,149 @@ class HttpService implements JasminHttpContract
     private string $url;
     private string $username;
     private string $password;
+
     public function __construct(?string $username, ?string $password, ?string $url)
     {
-        $this->url = $url ?? config('jasmin_client.url');
-        $this->username = $username ?? config('jasmin_client.username');
-        $this->password = $password ?? config('jasmin_client.password');
+        $this->url = $url ?? Config::get('jasmin_client.url');
+        $this->username = $username ?? Config::get('jasmin_client.username');
+        $this->password = $password ?? Config::get('jasmin_client.password');
     }
 
 
-    public function sendMessage(string $content, string $to, string $from, string $dlr, string $dlrUrl, string $dlrLevel): JasminHttpResponse
+    private function makeHeaders(): array
     {
-        return '';
+        return [
+            'Content-Type' => 'application/json',
+        ];
+    }
+
+
+    public function sendMessage(string $content, string $to, string $from, string $coding, int $priority, string $sdt, string $validityPeriod, string $dlr, string $dlrUrl, string $dlrLevel, string $dlrMethod, ?string $tags, ?string $hexContent, ?bool $asBinary = false): JasminHttpResponse
+    {
+        $url = $this->url . '/send';
+        $data = [
+            $content => $content,
+            'to' => $to,
+            'from' => $from,
+            'coding' => $coding,
+            'priority' => $priority,
+            'sdt' => $sdt,
+            'validity' => $validityPeriod,
+            'dlr' => $dlr,
+            'dlr-url' => $dlrUrl,
+            'dlr-level' => $dlrLevel,
+            'dlr-method' => $dlrMethod,
+            'tags' => $tags,
+            'hex-content' => $hexContent,
+            'as-binary' => $asBinary,
+            'username' => $this->username,
+            'password' => $this->password,
+        ];
+
+        try {
+            $response = Http::withHeaders($this->makeHeaders())->post($url, $data);
+        } catch (ConnectionException $e) {
+            throw JasminClientException::from($e);
+        }
+        return JasminHttpResponse::from($response);
+    }
+
+    public function checkBalance(): JasminHttpResponse
+    {
+        $url = $this->url . '/balance';
+        try {
+            $response = Http::withHeaders($this->makeHeaders())->get($url);
+        } catch (ConnectionException $e) {
+            throw JasminClientException::from($e);
+        }
+        return JasminHttpResponse::from($response);
+    }
+
+    public function checkRoute(?string $to): JasminHttpResponse
+    {
+        $url = $this->url . '/rate';
+        try {
+            $response = Http::withHeaders($this->makeHeaders())->get($url);
+        } catch (ConnectionException $e) {
+            throw JasminClientException::from($e);
+        }
+        return JasminHttpResponse::from($response);
+    }
+
+
+    public function getMetrics(): JasminHttpResponse
+    {
+        $url = $this->url . '/metrics';
+        try {
+            $response = Http::withHeaders($this->makeHeaders())->get($url);
+        } catch (ConnectionException $e) {
+            throw JasminClientException::from($e);
+        }
+        return JasminHttpResponse::from($response);
+    }
+
+
+    public function receiveMessage(Request $request, callable $callback): JsonResponse
+    {
+        $rules = [
+            'id' => ['required', 'string'],
+            'from' => ['required'],
+            'to' => ['required'],
+            'origin-connector' => ['required'],
+            'priority' => ['nullable'],
+            'coding' => ['nullable'],
+            'validity' => ['nullable'],
+            'content' => ['nullable'],
+            'binary' => ['nullable'],
+        ];
+        $validator = Validator::make($request->input(), $rules);
+        if ($validator->fails()) {
+            Log::info("Invalid request received from jasmin");
+            return new JsonResponse("Invalid Request", 400);
+        }
+        $IncomingMessage = new IncomingMessage(
+            id: $request->input('id'),
+            from: $request->input('from'),
+            to: $request->input('to'),
+            originConnector: $request->input('origin-connector'),
+            priority: $request->input('priority'),
+            coding: $request->input('coding'),
+            validity: $request->input('validity'),
+            message: $request->input('content'),
+            binary: $request->input('binary')
+        );
+        if ($callback($IncomingMessage)) {
+            return new JsonResponse("ACK/Jasmin", 200);
+        }
+        return new JsonResponse("NACK/Jasmin", 400);
+    }
+
+    public function receiveDlr(Request $request, callable $callback): JsonResponse
+    {
+        $rules = [
+
+        ];
+        $validator = Validator::make($request->input(), $rules);
+        if ($validator->fails()) {
+            Log::info("Invalid request received from jasmin");
+            return new JsonResponse("Invalid Request", 400);
+        }
+        $dlr = new HttpDlr(
+            id: $request->input('id'),
+            smscId: $request->input('smsc-id'),
+            messageStatus: $request->input('message-status'),
+            level: $request->input('level'),
+            connector: $request->input('connector'),
+            submittedDdate: $request->input('subdate'),
+            doneDate: $request->input('donedate'),
+            submittedCount: $request->input('sub'),
+            deliveredCunt: $request->input('dlvrd'),
+            error: $request->input('err'),
+            text: $request->input('text')
+        );
+        if ($callback($dlr)) {
+            return new JsonResponse("ACK/Jasmin", 200);
+        }
+        return new JsonResponse("NACK/Jasmin", 400);
     }
 }
