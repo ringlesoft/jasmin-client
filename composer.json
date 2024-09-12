@@ -26,7 +26,9 @@
     ],
     "require": {
         "php": ">=8.1",
-        "illuminate/collections": "^11.23"
+        "illuminate/support": "10.*|^11.23",
+        "illuminate/collections": "10.*|^11.23",
+        "illuminate/http": "^11.23"
     }
     ,
     "require-dev": {
@@ -43,5 +45,13 @@
             "dont-discover": [
             ]
         }
-    }
+    },
+    "branches": {
+        "stable": {
+            "name": "master"
+        }
+    },
+    "version": "0.0.1",
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
