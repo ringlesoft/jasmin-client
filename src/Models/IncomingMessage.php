@@ -60,12 +60,12 @@ class IncomingMessage
      */
     public string $binary;
 
-    public function __construct(string $id, string $from, string $to, string $OriginConnector, string $priority, bool $coding, string $validity, string $message, string $binary)
+    public function __construct(string $id, string $from, string $to, string $originConnector, string $priority, bool $coding, string $validity, string $message, string $binary)
     {
         $this->id = $id;
         $this->from = $from;
         $this->to = $to;
-        $this->originConnector = $OriginConnector;
+        $this->originConnector = $originConnector;
         $this->priority = $priority;
         $this->coding = $coding;
         $this->validity = $validity;
