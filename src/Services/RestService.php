@@ -3,6 +3,7 @@
 namespace RingleSoft\JasminClient\Services;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use RingleSoft\JasminClient\Contracts\JasminRestContract;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
@@ -15,9 +16,9 @@ class RestService implements JasminRestContract
     private string $password;
     public function __construct(?string $username, ?string $password, ?string $url)
     {
-        $this->url = $url ?? config('jasmin_client.url');
-        $this->username = $username ?? config('jasmin_client.username');
-        $this->password = $password ?? config('jasmin_client.password');
+        $this->url = $url ?? Config::get('jasmin_client.url');
+        $this->username = $username ?? Config::get('jasmin_client.username');
+        $this->password = $password ?? Config::get('jasmin_client.password');
     }
 
 
@@ -31,13 +32,13 @@ class RestService implements JasminRestContract
 
     /**
      * Send a single message
-     *
      * @param string $content
      * @param string $to
      * @param string $from
      * @param string $dlr
      * @param string $dlrUrl
      * @param string $dlrLevel
+     * @param bool|null $asBinary
      * @return JasminRestResponse
      * @throws JasminClientException
      */

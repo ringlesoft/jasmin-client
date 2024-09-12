@@ -39,10 +39,21 @@ interface JasminRestContract
      * @return mixed
      * @throws JasminClientException
      */
-    public function checkBalance();
+    public function checkBalance(): JasminRestResponse;
     // Route check
+
+    /**
+     * @param string|null $to
+     * @return JasminRestResponse
+     */
     public function checkRoute(?string $to): JasminRestResponse;
 
     // Ping
+
+    /**
+     * @return JasminRestResponse
+     */
     public function ping(): JasminRestResponse;
+
+
 }
