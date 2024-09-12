@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use RingleSoft\JasminClient\Contracts\JasminRestContract;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
-use RingleSoft\JasminClient\Models\Batch;
 use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
 use RingleSoft\JasminClient\Models\JasminRestResponse;
 
@@ -20,7 +19,7 @@ class RestService implements JasminRestContract
     private string $url;
     private string $username;
     private string $password;
-    public function __construct(?string $username, ?string $password, ?string $url)
+    public function __construct(?string $username = null, ?string $password = null, ?string $url = null)
     {
         $this->url = $url ?? Config::get('jasmin_client.url');
         $this->username = $username ?? Config::get('jasmin_client.username');
@@ -63,6 +62,7 @@ class RestService implements JasminRestContract
 
         try {
             $response = Http::withHeaders($headers)->post($url, $data);
+            dump($response->body());
         } catch (ConnectionException $e) {
            throw JasminClientException::from($e);
         }
@@ -127,6 +127,7 @@ class RestService implements JasminRestContract
         $url = $this->url . '/secure/ping';
         try {
             $response = Http::withHeaders($headers)->get($url);
+            dd($response->body());
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
         }
