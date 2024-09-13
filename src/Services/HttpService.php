@@ -13,7 +13,9 @@ use RingleSoft\JasminClient\Contracts\JasminHttpContract;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\Callbacks\DeliveryCallback;
 use RingleSoft\JasminClient\Models\IncomingMessage;
-use RingleSoft\JasminClient\Models\JasminHttpResponse;
+use RingleSoft\JasminClient\Models\Responses\JasminResponse;
+use RingleSoft\JasminClient\Models\Responses\JasminHttpResponse;
+use RingleSoft\JasminClient\Validators\HttpMessageValidator;
 
 class HttpService implements JasminHttpContract
 {
@@ -37,37 +39,61 @@ class HttpService implements JasminHttpContract
     }
 
 
-    public function sendMessage(string $content, string $to, string $from, string $coding, int $priority, string $sdt, string $validityPeriod, string $dlr, string $dlrUrl, string $dlrLevel, string $dlrMethod, ?string $tags, ?string $hexContent, ?bool $asBinary = false): JasminHttpResponse
+    public function sendMessage(
+        string $content,
+        string $to,
+        string $from,
+        string $coding,
+        int $priority,
+        ?string $sdt,
+        ?string $validityPeriod,
+        string $dlr,
+        string $dlrUrl,
+        int $dlrLevel,
+        string $dlrMethod,
+        ?string $tags,
+        ?string $hexContent,
+        ?bool $asBinary = false): JasminResponse
     {
         $url = $this->url . '/send';
         $data = [
-            $content => $content,
+            "content" => $content,
             'to' => $to,
             'from' => $from,
             'coding' => $coding,
             'priority' => $priority,
             'sdt' => $sdt,
-            'validity' => $validityPeriod,
+            'validity-period' => $validityPeriod,
             'dlr' => $dlr,
             'dlr-url' => $dlrUrl,
-            'dlr-level' => $dlrLevel,
+            'dlr-level' =>  $dlrLevel,
             'dlr-method' => $dlrMethod,
             'tags' => $tags,
             'hex-content' => $hexContent,
-            'as-binary' => $asBinary,
             'username' => $this->username,
             'password' => $this->password,
         ];
 
+        $data = array_filter($data);
+
+        $validator = HttpMessageValidator::validate($data);
+
+        if ($validator->fails()) {
+            Log::info("Data validation failed: ");
+            return new JasminHttpResponse("Data validation failed",
+                "failed", $validator->errors()->all());
+        }
+
         try {
             $response = Http::withHeaders($this->makeHeaders())->post($url, $data);
         } catch (ConnectionException $e) {
+            Log::debug($e);
             throw JasminClientException::from($e);
         }
         return JasminHttpResponse::from($response);
     }
 
-    public function checkBalance(): JasminHttpResponse
+    public function checkBalance(): JasminResponse
     {
         $url = $this->url . '/balance';
         try {
@@ -78,7 +104,7 @@ class HttpService implements JasminHttpContract
         return JasminHttpResponse::from($response);
     }
 
-    public function checkRoute(?string $to): JasminHttpResponse
+    public function checkRoute(?string $to): JasminResponse
     {
         $url = $this->url . '/rate';
         try {
@@ -90,7 +116,7 @@ class HttpService implements JasminHttpContract
     }
 
 
-    public function getMetrics(): JasminHttpResponse
+    public function getMetrics(): JasminResponse
     {
         $url = $this->url . '/metrics';
         try {

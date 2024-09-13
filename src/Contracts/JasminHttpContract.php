@@ -5,8 +5,7 @@ namespace RingleSoft\JasminClient\Contracts;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
-use RingleSoft\JasminClient\Models\IncomingMessage;
-use RingleSoft\JasminClient\Models\JasminHttpResponse;
+use RingleSoft\JasminClient\Models\Responses\JasminResponse;
 
 interface JasminHttpContract
 {
@@ -22,31 +21,31 @@ interface JasminHttpContract
      * @param string $validityPeriod
      * @param string $dlr
      * @param string $dlrUrl
-     * @param string $dlrLevel
+     * @param int $dlrLevel
      * @param string $dlrMethod
      * @param string|null $tags
      * @param string|null $hexContent
      * @param bool|null $asBinary
-     * @return JasminHttpResponse
+     * @return JasminResponse
      */
-    public function sendMessage(string $content, string $to, string $from, string $coding, int $priority, string $sdt, string $validityPeriod, string $dlr, string $dlrUrl, string $dlrLevel, string $dlrMethod, ?string $tags, ?string $hexContent, ?bool $asBinary = false): JasminHttpResponse;
+    public function sendMessage(string $content, string $to, string $from, string $coding, int $priority, string $sdt, string $validityPeriod, string $dlr, string $dlrUrl, int $dlrLevel, string $dlrMethod, ?string $tags, ?string $hexContent, ?bool $asBinary = false): JasminResponse;
 
 
     /**
      * @return mixed
      * @throws JasminClientException
      */
-    public function checkBalance(): JasminHttpResponse;
+    public function checkBalance(): JasminResponse;
     // Route check
 
     /**
      * @param string|null $to
-     * @return JasminHttpResponse
+     * @return JasminResponse
      */
-    public function checkRoute(?string $to): JasminHttpResponse;
+    public function checkRoute(?string $to): JasminResponse;
 
 
-    public function getMetrics(): JasminHttpResponse;
+    public function getMetrics(): JasminResponse;
 
     /**
      * @param Request $request
