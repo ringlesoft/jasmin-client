@@ -41,4 +41,9 @@ class BatchCallback
         $closingChar = "”";
         return Str::of($this->statusText)->after($openingChar)->before($closingChar)->toString();
     }
+
+    public function getBatchId(): string
+    {
+        return $this->batchId;
+    }
 }

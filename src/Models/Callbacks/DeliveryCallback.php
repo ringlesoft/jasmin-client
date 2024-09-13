@@ -14,7 +14,7 @@ class DeliveryCallback
      * Message id returned from the SMS-C
      * @var string
      */
-    public string $smscId;
+    public ?string $smscId = null;
 
     /**
      * Delivery status
@@ -70,7 +70,7 @@ class DeliveryCallback
      */
     public ?string $text;
 
-    public function __construct(string $id, string $smscId, string $messageStatus, int $level, string $connector, ?string $submittedDate, ?string $doneDate, ?int $submittedCount, ?int $deliveredCunt, ?int $error, ?string $text) {
+    public function __construct(string $id, string $messageStatus, int $level, string $connector, ?string $smscId,  ?string $submittedDate, ?string $doneDate, ?int $submittedCount, ?int $deliveredCunt, ?int $error, ?string $text) {
         $this->id = $id;
         $this->smscId = $smscId;
         $this->messageStatus = $messageStatus;
@@ -87,7 +87,17 @@ class DeliveryCallback
     public static function rules(): array
     {
         return [
-
+            'id' => 'required|uuid',
+            'message_status' => 'required',
+            'level' => 'required|integer|in:1,2,3',
+            'connector' => 'required|string',
+            'id_smsc' => 'nullable|integer',
+            'subdate' => 'nullable',
+            'donedate' => 'nullable',
+            'sub' => 'nullable',
+            'dlvrd' => 'nullable',
+            'err' => 'nullable',
+            'text' => 'nullable|string|max:25',
         ];
     }
 

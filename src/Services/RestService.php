@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use RingleSoft\JasminClient\Contracts\JasminRestContract;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
+use RingleSoft\JasminClient\Models\Callbacks\DeliveryCallback;
 use RingleSoft\JasminClient\Models\Responses\JasminResponse;
 use RingleSoft\JasminClient\Models\Responses\JasminRestResponse;
 
@@ -63,13 +64,14 @@ class RestService implements JasminRestContract
         $headers = $this->makeHeaders();
         $url = $this->url . '/secure/send';
         $data = [
-            "message" => $content,
+            "content" => $content,
             "to" => $to,
             "from" => $from,
             "dlr" => $dlr,
             "dlr-url" => $dlrUrl,
             "dlr-level" => $dlrLevel,
         ];
+        $data = array_filter($data);
 
         try {
             $response = Http::withHeaders($headers)->post($url,
@@ -148,7 +150,7 @@ class RestService implements JasminRestContract
 
     /**
      * @param Request $request
-     * @param callable $callback (BatchCallback $batchCallback)
+     * @param callback(BatchCallback $batch): bool $callback
      * @return JsonResponse
      */
     public function receiveBatchCallback(Request $request, callable $callback): JsonResponse

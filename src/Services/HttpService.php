@@ -128,6 +128,11 @@ class HttpService implements JasminHttpContract
     }
 
 
+    /**
+     * @param Request $request
+     * @param callback(IncomingMessage $message): bool $callback
+     * @return JsonResponse
+     */
     public function receiveMessage(Request $request, callable $callback): JsonResponse
     {
         $rules = [
@@ -165,7 +170,7 @@ class HttpService implements JasminHttpContract
 
     /**
      * @param Request $request
-     * @param callable $callback(DeliveryCallback $deliveryCallback)
+     * @param callback(DeliveryCallback $dlr): bool $callback
      * @return JsonResponse
      */
     public function receiveDlrCallback(Request $request, callable $callback): JsonResponse
@@ -174,14 +179,15 @@ class HttpService implements JasminHttpContract
         $validator = Validator::make($request->input(), DeliveryCallback::rules());
         if ($validator->fails()) {
             Log::info("Invalid request received from jasmin");
+            Log::debug($validator->errors()->all());
             return new JsonResponse("Invalid Request", 400);
         }
         $dlr = new DeliveryCallback(
             id: $request->input('id'),
-            smscId: $request->input('smsc-id'),
-            messageStatus: $request->input('message-status'),
+            messageStatus: $request->input('message_status'),
             level: $request->input('level'),
             connector: $request->input('connector'),
+            smscId: $request->input('smsc-id'),
             submittedDate: $request->input('subdate'),
             doneDate: $request->input('donedate'),
             submittedCount: $request->input('sub'),
@@ -192,6 +198,6 @@ class HttpService implements JasminHttpContract
         if ($callback($dlr)) {
             return new JsonResponse("ACK/Jasmin", 200);
         }
-        return new JsonResponse("NACK/Jasmin", 400);
+        return new JsonResponse("FAIL/Jasmin", 400);
     }
 }
