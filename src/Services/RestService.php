@@ -12,13 +12,15 @@ use Illuminate\Support\Facades\Validator;
 use RingleSoft\JasminClient\Contracts\JasminRestContract;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
-use RingleSoft\JasminClient\Models\JasminRestResponse;
+use RingleSoft\JasminClient\Models\Responses\JasminResponse;
+use RingleSoft\JasminClient\Models\Responses\JasminRestResponse;
 
 class RestService implements JasminRestContract
 {
     private string $url;
     private string $username;
     private string $password;
+
     public function __construct(?string $username = null, ?string $password = null, ?string $url = null)
     {
         $this->url = $url ?? Config::get('jasmin_client.url');
@@ -31,6 +33,7 @@ class RestService implements JasminRestContract
     {
         return [
             'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
             'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password),
         ];
     }
@@ -44,10 +47,18 @@ class RestService implements JasminRestContract
      * @param string $dlrUrl
      * @param string $dlrLevel
      * @param bool|null $asBinary
-     * @return JasminRestResponse
+     * @return JasminResponse
      * @throws JasminClientException
      */
-    public function sendMessage(string $content, string $to, string $from, string $dlr, string $dlrUrl, string $dlrLevel, ?bool $asBinary = false): JasminRestResponse
+    public function sendMessage(
+        string $content,
+        string $to,
+        string $from,
+        string $dlr,
+        string $dlrUrl,
+        string $dlrLevel,
+        ?bool  $asBinary = false
+    ): JasminResponse
     {
         $headers = $this->makeHeaders();
         $url = $this->url . '/secure/send';
@@ -61,16 +72,17 @@ class RestService implements JasminRestContract
         ];
 
         try {
-            $response = Http::withHeaders($headers)->post($url, $data);
+            $response = Http::withHeaders($headers)->post($url,
+                $data);
             dump($response->body());
         } catch (ConnectionException $e) {
-           throw JasminClientException::from($e);
+            throw JasminClientException::from($e);
         }
 
         return JasminRestResponse::from($response);
     }
 
-    public function sendMultipleMessages(array $messages, ?array $globals, ?string $callbackUrl, ?string $errbackUrl, ?bool $asBinary = false): JasminRestResponse
+    public function sendMultipleMessages(array $messages, ?array $globals, ?string $callbackUrl, ?string $errbackUrl, ?bool $asBinary = false): JasminResponse
     {
         $headers = $this->makeHeaders();
         $url = $this->url . '/secure/sendbatch';
@@ -94,7 +106,7 @@ class RestService implements JasminRestContract
     /**
      * @throws JasminClientException
      */
-    public function checkBalance(): JasminRestResponse
+    public function checkBalance(): JasminResponse
     {
         $headers = $this->makeHeaders();
         $url = $this->url . '/secure/balance';
@@ -109,7 +121,7 @@ class RestService implements JasminRestContract
     /**
      * @throws JasminClientException
      */
-    public function checkRoute(?string $to): JasminRestResponse
+    public function checkRoute(?string $to): JasminResponse
     {
         $headers = $this->makeHeaders();
         $url = $this->url . '/secure/rate' . ($to ? "?to=$to" : '');
@@ -121,7 +133,7 @@ class RestService implements JasminRestContract
         return JasminRestResponse::from($response);
     }
 
-    public function ping(): JasminRestResponse
+    public function ping(): JasminResponse
     {
         $headers = $this->makeHeaders();
         $url = $this->url . '/secure/ping';
@@ -136,7 +148,7 @@ class RestService implements JasminRestContract
 
     /**
      * @param Request $request
-     * @param callable $callback(BatchCallback $batchCallback)
+     * @param callable $callback (BatchCallback $batchCallback)
      * @return JsonResponse
      */
     public function receiveBatchCallback(Request $request, callable $callback): JsonResponse

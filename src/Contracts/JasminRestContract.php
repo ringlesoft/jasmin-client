@@ -5,7 +5,7 @@ namespace RingleSoft\JasminClient\Contracts;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
-use RingleSoft\JasminClient\Models\JasminRestResponse;
+use RingleSoft\JasminClient\Models\Responses\JasminResponse;
 
 interface JasminRestContract
 {
@@ -20,10 +20,10 @@ interface JasminRestContract
      * @param string $dlrUrl
      * @param string $dlrLevel
      * @param bool|null $asBinary
-     * @return JasminRestResponse
+     * @return JasminResponse
      * @throws JasminClientException
      */
-    public function sendMessage(string $content, string $to, string $from, string $dlr, string $dlrUrl, string $dlrLevel, ?bool $asBinary = false): JasminRestResponse;
+    public function sendMessage(string $content, string $to, string $from, string $dlr, string $dlrUrl, string $dlrLevel, ?bool $asBinary = false): JasminResponse;
 
     /**
      * Send multiple messages
@@ -32,30 +32,30 @@ interface JasminRestContract
      * @param string|null $callbackUrl
      * @param string|null $errbackUrl
      * @param bool|null $asBinary
-     * @return JasminRestResponse
+     * @return JasminResponse
      */
-    public function sendMultipleMessages(array $messages, ?array $globals, ?string $callbackUrl, ?string $errbackUrl, ?bool $asBinary = false): JasminRestResponse;
+    public function sendMultipleMessages(array $messages, ?array $globals, ?string $callbackUrl, ?string $errbackUrl, ?bool $asBinary = false): JasminResponse;
     // Send binary messages
 
     /**
      * @return mixed
      * @throws JasminClientException
      */
-    public function checkBalance(): JasminRestResponse;
+    public function checkBalance(): JasminResponse;
     // Route check
 
     /**
      * @param string|null $to
-     * @return JasminRestResponse
+     * @return JasminResponse
      */
-    public function checkRoute(?string $to): JasminRestResponse;
+    public function checkRoute(?string $to): JasminResponse;
 
     // Ping
 
     /**
-     * @return JasminRestResponse
+     * @return JasminResponse
      */
-    public function ping(): JasminRestResponse;
+    public function ping(): JasminResponse;
 
     /**
      * @param Request $request
