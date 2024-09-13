@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Facades\JasminClient;
+use RingleSoft\JasminClient\Models\Responses\JasminResponse;
 
 class Message
 {
@@ -17,7 +18,17 @@ class Message
      * @var string|null
      */
     public ?string $to;
+
+    /**
+     * Originating address, In case rewriting of the sender’s address is supported or permitted by the SMS-C
+     * used to transmit the message, this number is transmitted as the originating address
+     * @var string|null
+     */
     public ?string $from;
+
+    /**
+     * @var string|null
+     */
     public ?string $content;
     public bool $dlr = true;
     public ?string $dlrUrl;
@@ -28,11 +39,36 @@ class Message
      */
     public ?int $dlrLevel = 2;
 
+    /**
+     * Sets the Data Coding Scheme bits, default is 0, accepts values all allowed values in SMPP protocol
+     * @var int|null
+     */
     private ?int $coding = 0;
     private ?int $priority = 0;
-    private ?string $sdt = 'utf-8';
-    private ?string $validityPeriod = '300';
+
+    /**
+     * Specifies the scheduled delivery time at which the message delivery should be first attempted,
+     * default is value is None (message will take SMSC’s default).
+     * Supports Absolute and Relative Times per SMPP v3.4 Issue 1.2
+     * @var string|null
+     */
+    private ?string $sdt = null;
+
+    /**
+     * Message validity (minutes) to be passed to SMSC, default is value is None (message will take SMSC’s default)
+     * @var int|null
+     */
+    private ?int $validityPeriod = null;
+
+    /**
+     * DLR is transmitted through http to a third party application using GET or POST method.
+     * @var string|null
+     */
     private ?string $dlrMethod = 'GET';
+
+    /**
+     * @var int|null
+     */
     private ?int $tags = null;
     private ?string $hexContent = null;
 
@@ -71,6 +107,12 @@ class Message
         return $this;
     }
 
+    public function dlrCallback(string $dlrUrl): self
+    {
+        $this->dlrUrl = $dlrUrl;
+        return $this;
+    }
+
     public function via(string $route): self
     {
         $this->via = $route;
@@ -85,29 +127,28 @@ class Message
             if ($this->via === 'http') {
                 return JasminClient::http()->sendMessage(
                     content: $this->content,
-                    to: $this->to,
+                    to: $this->sanitizeNumber($this->to),
                     from: $this->from,
                     coding: $this->coding,
                     priority: $this->priority,
                     sdt: $this->sdt,
                     validityPeriod: $this->validityPeriod,
-                    dlr: $this->dlr,
+                    dlr: $this->dlr ? 'yes' : 'no',
                     dlrUrl: $this->dlrUrl,
                     dlrLevel: $this->dlrLevel,
                     dlrMethod: $this->dlrMethod,
                     tags: $this->tags,
                     hexContent: $this->hexContent,
                 );
-            } else {
-                return JasminClient::rest()->sendMessage(
-                    $this->content,
-                    $this->to,
-                    $this->from,
-                    $this->dlr,
-                    $this->dlrUrl,
-                    $this->dlrLevel
-                );
             }
+            return JasminClient::rest()->sendMessage(
+                content: $this->content,
+                to: $this->to,
+                from: $this->from,
+                dlr: $this->dlr,
+                dlrUrl: $this->dlrUrl,
+                dlrLevel: $this->dlrLevel
+            );
         } catch (JasminClientException $e) {
             Log::error($e->getMessage());
         }
