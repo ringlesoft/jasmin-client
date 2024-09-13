@@ -126,4 +126,11 @@ class Message
             "is_binary" => $this->isBinary
         ]);
     }
+
+
+    private function sanitizeNumber(string $phone): string
+    {
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        return $phone;
+    }
 }
