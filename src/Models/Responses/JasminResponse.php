@@ -2,17 +2,32 @@
 
 namespace RingleSoft\JasminClient\Models\Responses;
 
+use Illuminate\Http\Client\Response;
+
 class JasminResponse
 {
-    public ?string $status;
-    public ?string $message;
+    public Response $response;
+    public ?int $status;
     public ?array $data;
-    public ?string $body;
 
-    public function __construct(?string $status, ?string $message, ?array $data)
+    public function __construct(Response $response, ?int $status = null, ?array $data = null)
     {
-        $this->status = $status;
-        $this->message = $message;
-        $this->data = $data;
+        $this->response = $response;
+        $this->status = $status ?? $response->status();
+        $this->data = $data ?? $response->json() ?? $response->body();
+    }
+
+    public function isSuccessful(): bool
+    {
+        return $this->response->ok();
+    }
+
+    public static function from(Response $response): static
+    {
+        return new static($response);
+    }
+
+    private function translateEror($error): ?string {
+        return '';
     }
 }
