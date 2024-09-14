@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Facades\JasminClient;
-use RingleSoft\JasminClient\Models\Responses\JasminResponse;
+use RingleSoft\JasminClient\Models\Jasmin\SentMessage;
 
 class Message
 {
@@ -30,7 +30,15 @@ class Message
      * @var string|null
      */
     public ?string $content;
+
+    /**
+     * @var bool
+     */
     public bool $dlr = true;
+
+    /**
+     * @var string|mixed|null
+     */
     public ?string $dlrUrl;
 
     /**
@@ -44,6 +52,10 @@ class Message
      * @var int|null
      */
     private ?int $coding = 0;
+
+    /**
+     * @var int|null
+     */
     private ?int $priority = 0;
 
     /**
@@ -70,46 +82,91 @@ class Message
      * @var int|null
      */
     private ?int $tags = null;
+
+    /**
+     * @var string|null
+     */
     private ?string $hexContent = null;
 
+    /**
+     * @var string|null
+     */
     private ?string $via;
 
-    public function __construct(?string $to = null, ?string $from = null, ?string $content = null, ?bool $dlr = null, ?string $dlrUrl = null, ?string $dlrLevel = null)
+    public function __construct(?string $to = null, ?string $from = null, ?string $content = null, ?bool $dlr = null, ?string $dlrUrl = null, ?string $dlrLevel = null, ?string $dlrMethod = null)
     {
         $this->to = $to;
         $this->from = $from;
         $this->content = $content;
         $this->dlr = ($dlr !== null) ? $dlr : $this->dlr;
-        $this->dlrUrl = $dlrUrl ?? Config::get('jasmin_client.default_callback_url');
+        $this->dlrUrl = $dlrUrl ?? Config::get('jasmin_client.dlr_callback_url');
+        $this->dlrMethod = $dlrMethod ?? Config::get('jasmin_client.dlr_method', 'POST');
+        $this->dlrLevel = $dlrLevel ?? Config::get('jasmin_client.dlr_level', 2);
     }
 
+    /**
+     * Set if the message should be sent as binary
+     * @param bool $binary
+     * @return $this
+     */
     public function asBinary(bool $binary): self
     {
         $this->isBinary = $binary;
         return $this;
     }
 
+    /**
+     * Set the message content
+     * @param string $content
+     * @return $this
+     */
     public function content(string $content): self
     {
         $this->content = $content;
         return $this;
     }
 
+    /**
+     * Set the destination address (phone number)
+     * @param string $to
+     * @return $this
+     */
     public function to(string $to): self
     {
         $this->to = $to;
         return $this;
     }
 
+    /**
+     * Set the originating address (SENDER ID)
+     * @param string $from
+     * @return $this
+     */
     public function from(string $from): self
     {
         $this->from = $from;
         return $this;
     }
 
-    public function dlrCallback(string $dlrUrl): self
+    /**
+     * Set the DLR callback url
+     * @param string $dlrUrl
+     * @return $this
+     */
+    public function dlrCallbackUrl(string $dlrUrl): self
     {
         $this->dlrUrl = $dlrUrl;
+        return $this;
+    }
+
+    /**
+     * Set if the message should be tracked for delivery
+     * @param $value
+     * @return $this
+     */
+    public function trackDelivery($value = true): self
+    {
+        $this->dlr = $value ? 'yes' :'no';
         return $this;
     }
 
@@ -120,12 +177,16 @@ class Message
     }
 
 
-    public function send(): ?JasminResponse
+    /**
+     * @return SentMessage
+     * @throws JasminClientException
+     */
+    public function send(): SentMessage
     {
 
         try {
             if ($this->via === 'http') {
-                return JasminClient::http()->sendMessage(
+                $response = JasminClient::http()->sendMessage(
                     content: $this->content,
                     to: $this->sanitizeNumber($this->to),
                     from: $this->from,
@@ -140,19 +201,27 @@ class Message
                     tags: $this->tags,
                     hexContent: $this->hexContent,
                 );
+            } else {
+                $response = JasminClient::rest()->sendMessage(
+                    content: $this->content,
+                    to: $this->sanitizeNumber($this->to),
+                    from: $this->from,
+                    dlr: $this->dlr ? 'yes' : 'no',
+                    dlrUrl: $this->dlrUrl,
+                    dlrLevel: $this->dlrLevel,
+                    dlrMethod: $this->dlrMethod
+                );
             }
-            return JasminClient::rest()->sendMessage(
-                content: $this->content,
-                to: $this->to,
-                from: $this->from,
-                dlr: $this->dlr,
-                dlrUrl: $this->dlrUrl,
-                dlrLevel: $this->dlrLevel
-            );
+            if($response->isSuccessful()) {
+                return SentMessage::fromResponse($response);
+            } else {
+                throw new JasminClientException("Failed to send message");
+            }
+
         } catch (JasminClientException $e) {
-            Log::error($e->getMessage());
+            Log::error("JasminClient: ". $e->getMessage());
+            throw $e;
         }
-        return null;
     }
 
     public function toArray(): array
@@ -161,9 +230,10 @@ class Message
             "to" => $this->to,
             "from" => $this->from,
             "content" => $this->content,
-            "dlr" => $this->dlr,
-            "dlr_url" => $this->dlrUrl,
-            "dlr_level" => $this->dlrLevel,
+            "dlr" => $this->dlr ? 'yes' : 'no',
+            "dlr-url" => $this->dlrUrl,
+            "dlr-level" => $this->dlrLevel,
+            "dlr-method" => $this->dlrMethod,
             "is_binary" => $this->isBinary
         ]);
     }
@@ -171,7 +241,7 @@ class Message
 
     private function sanitizeNumber(string $phone): string
     {
-        $phone = preg_replace('/[^0-9]/', '', $phone);
+        $phone = preg_replace('/\D/', '', $phone);
         return $phone;
     }
 }
