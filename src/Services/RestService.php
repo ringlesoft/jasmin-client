@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use RingleSoft\JasminClient\Contracts\JasminRestContract;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
-use RingleSoft\JasminClient\Models\Callbacks\DeliveryCallback;
 use RingleSoft\JasminClient\Models\Responses\JasminResponse;
 use RingleSoft\JasminClient\Models\Responses\JasminRestResponse;
+use RingleSoft\JasminClient\Validators\RestMessageValidator;
 
 class RestService implements JasminRestContract
 {
@@ -30,6 +31,9 @@ class RestService implements JasminRestContract
     }
 
 
+    /**
+     * @return string[]
+     */
     private function makeHeaders(): array
     {
         return [
@@ -47,6 +51,7 @@ class RestService implements JasminRestContract
      * @param string $dlr
      * @param string $dlrUrl
      * @param string $dlrLevel
+     * @param string|null $dlrMethod
      * @param bool|null $asBinary
      * @return JasminResponse
      * @throws JasminClientException
@@ -58,6 +63,7 @@ class RestService implements JasminRestContract
         string $dlr,
         string $dlrUrl,
         string $dlrLevel,
+        ?string $dlrMethod,
         ?bool  $asBinary = false
     ): JasminResponse
     {
@@ -70,13 +76,16 @@ class RestService implements JasminRestContract
             "dlr" => $dlr,
             "dlr-url" => $dlrUrl,
             "dlr-level" => $dlrLevel,
+            "dlr-method" => $dlrMethod,
         ];
         $data = array_filter($data);
-
+        $validator = RestMessageValidator::validate($data);
+        if ($validator->fails()) {
+            Log::info("Data validation failed: ");
+            throw ValidationException::withMessages($validator->errors()->all());
+        }
         try {
-            $response = Http::withHeaders($headers)->post($url,
-                $data);
-            dump($response->body());
+            $response = Http::withHeaders($headers)->post($url, $data);
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
         }
@@ -84,21 +93,27 @@ class RestService implements JasminRestContract
         return JasminRestResponse::from($response);
     }
 
-    public function sendMultipleMessages(array $messages, ?array $globals, ?string $callbackUrl, ?string $errbackUrl, ?bool $asBinary = false): JasminResponse
+    public function sendBatch(array $messages, ?array $globals, ?array $batchConfig, ?bool $asBinary = false): JasminResponse
     {
-        $headers = $this->makeHeaders();
         $url = $this->url . '/secure/sendbatch';
         $data = [
             "messages" => $messages,
             "globals" => $globals,
-            "batch_config" => ($callbackUrl || $errbackUrl) ? [
-                "callback_url" => $callbackUrl,
-                "errback_url" => $errbackUrl
-            ] : null
+            "batch_config" => $batchConfig
         ];
+
+//        $validator = RestBatchValidator::validate($data);
+//        if ($validator->fails()) {
+//            Log::info("Data validation failed: ");
+//            return new JasminRestResponse("Data validation failed",
+//                "failed", $validator->errors()->all());
+//        }
+
         try {
-            $response = Http::withHeaders($headers)->post($url, $data);
+            $response = Http::withHeaders($this->makeHeaders())->post($url, $data);
         } catch (ConnectionException $e) {
+            Log::debug($e);
+            dd($e);
             throw JasminClientException::from($e);
         }
         return JasminRestResponse::from($response);
