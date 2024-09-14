@@ -19,18 +19,18 @@ interface JasminRestContract
      * @param string $dlr
      * @param string $dlrUrl
      * @param string $dlrLevel
+     * @param string|null $dlrMethod
      * @param bool|null $asBinary
      * @return JasminResponse
      * @throws JasminClientException
      */
-    public function sendMessage(string $content, string $to, string $from, string $dlr, string $dlrUrl, string $dlrLevel, ?bool $asBinary = false): JasminResponse;
+    public function sendMessage(string $content, string $to, string $from, string $dlr, string $dlrUrl, string $dlrLevel, ?string $dlrMethod, ?bool $asBinary = false): JasminResponse;
 
     /**
      * Send multiple messages
      * @param array $messages
      * @param array|null $globals
-     * @param string|null $callbackUrl
-     * @param string|null $errbackUrl
+     * @param array|null $batchConfig
      * @param bool|null $asBinary
      * @return JasminResponse
      */
