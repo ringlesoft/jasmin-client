@@ -7,5 +7,7 @@ return [
     'batch_callback_url' => env('JASMIN_BATCH_CALLBACK_URL', 'http://localhost/jasmin-batch-callback'),
     'batch_errback_url' => env('JASMIN_BATCH_ERRBACK_URL', 'http://localhost/jasmin-batch-callback'),
 
+    'default_dlr_method' => env('JASMIN_DEFAULT_DLR_METHOD', 'POST'),
+    'default_dlr_level' => env('JASMIN_DEFAULT_DLR_LEVEL', 2),
     'batch_chunk_size' => env('JASMIN_BATCH_CHUNK_SIZE', 10000),
 ];
