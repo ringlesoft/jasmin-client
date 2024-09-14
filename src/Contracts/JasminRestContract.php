@@ -34,7 +34,7 @@ interface JasminRestContract
      * @param bool|null $asBinary
      * @return JasminResponse
      */
-    public function sendMultipleMessages(array $messages, ?array $globals, ?string $callbackUrl, ?string $errbackUrl, ?bool $asBinary = false): JasminResponse;
+    public function sendBatch(array $messages, ?array $globals, ?array $batchConfig, ?bool $asBinary = false): JasminResponse;
     // Send binary messages
 
     /**
