@@ -2,8 +2,8 @@
 
 namespace RingleSoft\JasminClient;
 
-use http\Client\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use RingleSoft\JasminClient\Models\Batch;
 use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
 use RingleSoft\JasminClient\Models\Callbacks\DeliveryCallback;
@@ -69,11 +69,11 @@ class JasminClient
 
     /**
      * Receive a dlr callback from the jasmin gateway
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param callable(DeliveryCallback $dlr): bool $callback
      * @return JsonResponse
      */
-    public static function receiveDlrCallback(\Illuminate\Http\Request $request, callable $callback): JsonResponse
+    public static function receiveDlrCallback(Request $request, callable $callback): JsonResponse
     {
         return self::http()->receiveDlrCallback($request, $callback);
     }

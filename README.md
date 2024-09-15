@@ -61,9 +61,9 @@ $sms = JasminClient::message()
 #### Sending multiple messages as a batch (Rest only)
 
 ```php
-    $message = new Message(to: "255711000000", content: "Hello There. Have a nice day");
-    $message2 = new Message(to: "255711000002", content: "Hello There. Have a nice day");
-    $batch = JasminClient->batch()
+    $message = JasminClient::message(to: "255711000000", content: "Hello There. Have a nice day");
+    $message2 = JasminClient::message(to: "255711000002", content: "Hello There. Have a nice day");
+    $batch = JasminClient::batch()
     ->addMessage($message)
     ->addMessage($message2)
     ->from("INFO")
