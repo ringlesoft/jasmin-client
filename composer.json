@@ -35,7 +35,8 @@
         "illuminate/support": "10.*|^11.23",
         "illuminate/collections": "10.*|^11.23",
         "illuminate/http": "^11.23",
-        "illuminate/validation": "^11.23"
+        "illuminate/validation": "^11.23",
+        "glushkovds/php-smpp": "^0.7.1"
     }
     ,
     "require-dev": {

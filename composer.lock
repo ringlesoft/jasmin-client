@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "53ca93389fbbf9072fc4d9a00ddc4309",
+    "content-hash": "d56337db2f2dcecff934ec1701fde068",
     "packages": [
         {
             "name": "brick/math",
@@ -440,6 +440,57 @@
                 }
             ],
             "time": "2023-10-12T05:21:21+00:00"
+        },
+        {
+            "name": "glushkovds/php-smpp",
+            "version": "v0.7.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/glushkovds/php-smpp.git",
+                "reference": "4868ceb7212f47087dfcd7fd6e4828d08522f494"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/glushkovds/php-smpp/zipball/4868ceb7212f47087dfcd7fd6e4828d08522f494",
+                "reference": "4868ceb7212f47087dfcd7fd6e4828d08522f494",
+                "shasum": ""
+            },
+            "require": {
+                "ext-sockets": "*",
+                "php": ">=7.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PhpSmpp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Denis Glushkov",
+                    "email": "amkarovec@gmail.com",
+                    "homepage": "https://github.com/glushkovds"
+                }
+            ],
+            "description": "Implementation SMPP v3.4 protocol. Includes sending and listening USSD.",
+            "homepage": "https://github.com/glushkovds/php-smpp",
+            "keywords": [
+                "lib",
+                "php",
+                "smpp"
+            ],
+            "support": {
+                "issues": "https://github.com/glushkovds/php-smpp/issues",
+                "source": "https://github.com/glushkovds/php-smpp/tree/v0.7.1"
+            },
+            "time": "2024-05-22T08:01:37+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
