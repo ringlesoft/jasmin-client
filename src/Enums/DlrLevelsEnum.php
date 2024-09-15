@@ -1,6 +1,6 @@
 <?php
 
-namespace RingleSoft\JasminCLient\Enums;
+namespace RingleSoft\JasminClient\Enums;
 
 enum DlrLevelsEnum: int
 {
