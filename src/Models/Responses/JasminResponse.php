@@ -14,7 +14,7 @@ class JasminResponse
     {
         $this->response = $response;
         $this->status = $status ?? $response->status();
-        $this->data = $data ?? $response->json() ?? $response->body();
+        $this->data = $data ?? $response->json() ?? null;
     }
 
     public function isSuccessful(): bool
