@@ -1,6 +1,6 @@
 <?php
 
-namespace RingleSoft\JasminCLient\Models;
+namespace RingleSoft\JasminClient\Models;
 
 use PhpSmpp\Pdu\DeliverReceiptSm;
 use RingleSoft\JasminClient\Models\Callbacks\DeliveryCallback;
@@ -20,7 +20,7 @@ class DeliveryMessage
 
     public function getMessageState(): string
     {
-        return match ($this->stat) {
+        return match ($this->messageStatus) {
             'DELIVRD' => 'DELIVERED',
             'EXPIRED' => 'EXPIRED',
             'DELETED' => 'DELETED',
