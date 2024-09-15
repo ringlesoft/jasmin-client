@@ -1,6 +1,7 @@
 <?php
 return [
     'url' => env('JASMIN_BASE_URL', 'http://127.0.0.1:1404'),
+    'smpp_url' => env('JASMIN_SMPP_URL', 'http://127.0.0.1'),
     'username' => env('JASMIN_USERNAME', "jasminadmin"),
     'password' => env('JASMIN_PASSWORD', "jasminpwd"),
     'dlr_callback_url' => env('JASMIN_DLR_CALLBACK_URL', 'http://localhost/jasmin-callback'),
