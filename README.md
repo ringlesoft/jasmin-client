@@ -1,5 +1,9 @@
 # Jasmin SMS Gateway Client for Laravel
-
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/ringlesoft/jasmin-client.svg)](https://packagist.org/packages/ringlesoft/jasmin-client)
+[![Total Downloads](https://img.shields.io/packagist/dt/ringlesoft/jasmin-client.svg)](https://packagist.org/packages/ringlesoft/jasmin-client)
+[![PHP Version Require](https://poser.pugx.org/ringlesoft/jasmin-client/require/php)](https://packagist.org/ringlesoft/jasmin-client)
+[![Dependents](https://poser.pugx.org/ringlesoft/jasmin-client/dependents)](https://packagist.org/packages/ringlesoft/jasmin-client)
+***
 A Laravel package for seamless integration with Jasmin SMS Gateway, supporting HTTP, REST API, and SMPP connections.
 
 ## Features
@@ -113,6 +117,6 @@ This package is open-sourced software licensed under the MIT license.
 
 Follow me on <a href="https://x.com/ringunger">X</a>: <a href="https://x.com/ringunger">@ringunger</a><br>
 Email me: <a href="mailto:ringunger@gmail.com">ringunger@gmail.com</a><br>
-Website: [https://ringlesoft.com](https://ringlesoft.com/packages/laravel-process-approval)
+Website: [https://ringlesoft.com](https://ringlesoft.com/packages/jasmin-client)
 
 > Note: This package is still under development. Please report any issues you encounter.
