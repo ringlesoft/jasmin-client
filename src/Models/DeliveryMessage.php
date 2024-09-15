@@ -8,13 +8,13 @@ use RingleSoft\JasminClient\Models\Callbacks\DeliveryCallback;
 class DeliveryMessage
 {
     public function __construct(
-        public string $id,
-        public int    $sub,
-        public int    $dlvrd,
-        public string $submitDate,
+        public string $getMessageId,
+        public int    $submittedCount,
+        public int    $deliveredCount,
+        public string $submittedDate,
         public string $doneDate,
-        public string $stat,
-        public string $err,
+        public string $messageStatus,
+        public string $error,
         public string $text,
     ) {}
 
@@ -35,13 +35,13 @@ class DeliveryMessage
     public static function fromCallback(DeliveryCallback $callback): self
     {
         return new self(
-            id: $callback->getMessageId(),
-            sub: $callback->submittedCount,
-            dlvrd: $callback->deliveredCount,
-            submitDate: $callback->submittedDate,
+            getMessageId: $callback->getMessageId(),
+            submittedCount: $callback->submittedCount,
+            deliveredCount: $callback->deliveredCount,
+            submittedDate: $callback->submittedDate,
             doneDate: $callback->doneDate,
-            stat: $callback->messageStatus,
-            err: $callback->error,
+            messageStatus: $callback->messageStatus,
+            error: $callback->error,
             text: $callback->text
         );
     }
@@ -49,13 +49,13 @@ class DeliveryMessage
     public static function fromSmppDeliveyr(DeliverReceiptSm $delivery): self
     {
         return new self(
-            id: $delivery->msgId,
-            sub: $delivery->state,
-            dlvrd: $delivery->state,
-            submitDate: $delivery->submitDate,
+            getMessageId: $delivery->msgId,
+            submittedCount: $delivery->state,
+            deliveredCount: $delivery->state,
+            submittedDate: $delivery->submitDate,
             doneDate: $delivery->doneDate,
-            stat: $delivery->state,
-            err: $delivery->state,
+            messageStatus: $delivery->state,
+            error: $delivery->state,
             text: $delivery->state
         );
     }
