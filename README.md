@@ -114,3 +114,5 @@ This package is open-sourced software licensed under the MIT license.
 Follow me on <a href="https://x.com/ringunger">X</a>: <a href="https://x.com/ringunger">@ringunger</a><br>
 Email me: <a href="mailto:ringunger@gmail.com">ringunger@gmail.com</a><br>
 Website: [https://ringlesoft.com](https://ringlesoft.com/packages/laravel-process-approval)
+
+> Note: This package is still under development. Please report any issues you encounter.
