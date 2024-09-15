@@ -14,7 +14,6 @@ use RingleSoft\JasminClient\Contracts\JasminRestContract;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
 use RingleSoft\JasminClient\Models\Responses\JasminResponse;
-use RingleSoft\JasminClient\Models\Responses\JasminRestResponse;
 use RingleSoft\JasminClient\Validators\RestMessageValidator;
 
 class RestService implements JasminRestContract
@@ -90,7 +89,7 @@ class RestService implements JasminRestContract
             throw JasminClientException::from($e);
         }
 
-        return JasminRestResponse::from($response);
+        return JasminResponse::from($response);
     }
 
     public function sendBatch(array $messages, ?array $globals, ?array $batchConfig, ?bool $asBinary = false): JasminResponse
@@ -105,7 +104,7 @@ class RestService implements JasminRestContract
 //        $validator = RestBatchValidator::validate($data);
 //        if ($validator->fails()) {
 //            Log::info("Data validation failed: ");
-//            return new JasminRestResponse("Data validation failed",
+//            return new JasminResponse("Data validation failed",
 //                "failed", $validator->errors()->all());
 //        }
 
@@ -116,7 +115,7 @@ class RestService implements JasminRestContract
             dd($e);
             throw JasminClientException::from($e);
         }
-        return JasminRestResponse::from($response);
+        return JasminResponse::from($response);
     }
 
 
@@ -132,7 +131,7 @@ class RestService implements JasminRestContract
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
         }
-        return JasminRestResponse::from($response);
+        return JasminResponse::from($response);
     }
 
     /**
@@ -147,7 +146,7 @@ class RestService implements JasminRestContract
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
         }
-        return JasminRestResponse::from($response);
+        return JasminResponse::from($response);
     }
 
     public function ping(): JasminResponse
@@ -160,7 +159,7 @@ class RestService implements JasminRestContract
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
         }
-        return JasminRestResponse::from($response);
+        return JasminResponse::from($response);
     }
 
     /**

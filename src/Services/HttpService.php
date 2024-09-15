@@ -113,14 +113,19 @@ class HttpService implements JasminHttpContract
     }
 
     /**
+     * Check the balance of the account
      * @return JasminResponse
      * @throws JasminClientException
      */
     public function checkBalance(): JasminResponse
     {
         $url = $this->url . '/balance';
+        $data = [
+            "username" => $this->username,
+            "password" => $this->password
+        ];
         try {
-            $response = Http::withHeaders($this->makeHeaders())->get($url);
+            $response = Http::withHeaders($this->makeHeaders())->get($url, $data);
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
         }
@@ -132,11 +137,19 @@ class HttpService implements JasminHttpContract
      * @return JasminResponse
      * @throws JasminClientException
      */
-    public function checkRoute(?string $to): JasminResponse
+    public function checkRoute(?string $to, ?string $from = null, ?string $coding = null, ?string $content = null): JasminResponse
     {
         $url = $this->url . '/rate';
+        $data = [
+            "to" => $to,
+            "from" => $from,
+            "coding" => $coding,
+            "content" => $content,
+            "username" => $this->username,
+            "password" => $this->password
+        ];
         try {
-            $response = Http::withHeaders($this->makeHeaders())->get($url);
+            $response = Http::withHeaders($this->makeHeaders())->get($url, array_filter($data));
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
         }

@@ -42,9 +42,12 @@ interface JasminHttpContract
 
     /**
      * @param string|null $to
+     * @param string|null $from
+     * @param string|null $coding
+     * @param string|null $content
      * @return JasminResponse
      */
-    public function checkRoute(?string $to): JasminResponse;
+    public function checkRoute(?string $to, ?string $from = null, ?string $coding = null, ?string $content = null): JasminResponse;
 
 
     public function getMetrics(): JasminResponse;
