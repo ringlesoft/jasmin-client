@@ -23,7 +23,6 @@ class SentBatch
     public static function fromResponse(JasminResponse $response): self
     {
         $data = $response->data['data'] ?? '';
-        dump($data);
         if ($data !== '') {
             $batchId = $data['batchId'] ?? '';
             $messageCount = $data['messageCount'] ?? 0;

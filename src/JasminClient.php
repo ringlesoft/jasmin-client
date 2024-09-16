@@ -17,19 +17,25 @@ class JasminClient
 {
 
     /**
+     * @param string|null $username
+     * @param string|null $password
+     * @param string|null $url
      * @return HttpService
      */
-    public static function http(): HttpService
+    public static function http(?string $username = null, ?string $password = null, ?string $url = null): HttpService
     {
-        return new HttpService();
+        return new HttpService($username, $password, $url);
     }
 
     /**
+     * @param string|null $username
+     * @param string|null $password
+     * @param string|null $url
      * @return RestService
      */
-    public static function rest(): RestService
+    public static function rest(?string $username = null, ?string $password = null, ?string $url = null): RestService
     {
-        return new RestService();
+        return new RestService($username, $password, $url);
     }
 
     /**

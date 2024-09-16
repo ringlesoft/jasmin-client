@@ -183,7 +183,7 @@ class Message
      */
     public function send(): SentMessage
     {
-
+        // TODO check if all required fields are set
         try {
             if ($this->via === 'http') {
                 $response = JasminClient::http()->sendMessage(
