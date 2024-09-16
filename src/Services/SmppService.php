@@ -50,10 +50,10 @@ class SmppService implements JasminSmppContract
     public function receiveMessage(): ?Sm
     {
         $this->listenerService->listen(function (Sm $sm) {
-            var_dump($sm->msgId);
+//            var_dump($sm->msgId);
             if ($sm instanceof DeliverReceiptSm) {
-                var_dump($sm->state);
-                var_dump($sm->state === SMPP::STATE_DELIVERED);
+//                var_dump($sm->state);
+//                var_dump($sm->state === SMPP::STATE_DELIVERED);
                 REturn $sm;
             } else {
                 echo 'not message';
@@ -66,10 +66,10 @@ class SmppService implements JasminSmppContract
     public function receiveDeliveryReport(): ?Sm
     {
         $this->listenerService->listen(function (Sm $sm) {
-            var_dump($sm->msgId);
+//            var_dump($sm->msgId);
             if ($sm instanceof DeliverReceiptSm) {
-                var_dump($sm->state);
-                var_dump($sm->state === SMPP::STATE_DELIVERED);
+//                var_dump($sm->state);
+//                var_dump($sm->state === SMPP::STATE_DELIVERED);
                 return $sm;
             } else {
                 echo 'not message';
@@ -99,13 +99,13 @@ class SmppService implements JasminSmppContract
 
     public function receiveUssd(): ?Ussd {
         $this->listenerService->listen(function (Pdu $pdu) {
-            var_dump($pdu->id);
-            var_dump($pdu->sequence);
+//            var_dump($pdu->id);
+//            var_dump($pdu->sequence);
             if ($pdu instanceof Ussd) {
-                var_dump($pdu->status);
-                var_dump($pdu->source->value);
-                var_dump($pdu->destination->value);
-                var_dump($pdu->message);
+//                var_dump($pdu->status);
+//                var_dump($pdu->source->value);
+//                var_dump($pdu->destination->value);
+//                var_dump($pdu->message);
                 // do some job with ussd
                 return $pdu;
             }

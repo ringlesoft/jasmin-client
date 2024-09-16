@@ -25,11 +25,8 @@ class SentMessage
     public static function fromResponse(JasminResponse $response): self
     {
         $data = $response->data['data'] ?? '';
-        dump($data);
         if ($data !== '') {
             [$status, $messageId] = self::extractValues($data);
-            dump($status);
-            dump($messageId);
             return new self(status: $status, messageId: $messageId);
         }
         throw new RuntimeException("Invalid response from jasmin");
@@ -43,5 +40,10 @@ class SentMessage
             return [$status, $messageId];
         }
         return [null, null];
+    }
+
+    public function isSent()
+    {
+        return $this->messageId !== '' && $this->status === "Success";
     }
 }
