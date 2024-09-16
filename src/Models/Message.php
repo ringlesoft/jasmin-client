@@ -93,6 +93,10 @@ class Message
      */
     private ?string $via;
 
+    private ?string $routeUsername;
+    private ?string $routePassword;
+    private ?string $routeUrl;
+
     public function __construct(?string $to = null, ?string $from = null, ?string $content = null, ?bool $dlr = null, ?string $dlrUrl = null, ?string $dlrLevel = null, ?string $dlrMethod = null)
     {
         $this->to = $to;
@@ -170,7 +174,7 @@ class Message
         return $this;
     }
 
-    public function via(string $route): self
+    public function via(string $route, ?string $username = null, ?string $password = null, ?string $url = null): self
     {
         $this->via = $route;
         return $this;
@@ -186,7 +190,8 @@ class Message
         // TODO check if all required fields are set
         try {
             if ($this->via === 'http') {
-                $response = JasminClient::http()->sendMessage(
+                $response = JasminClient::http($this->routeUsername, $this->routePassword, $this->routeUrl)
+                    ->sendMessage(
                     content: $this->content,
                     to: $this->sanitizeNumber($this->to),
                     from: $this->from,
@@ -202,7 +207,8 @@ class Message
                     hexContent: $this->hexContent,
                 );
             } else {
-                $response = JasminClient::rest()->sendMessage(
+                $response = JasminClient::rest($this->routeUsername, $this->routePassword, $this->routeUrl)
+                    ->sendMessage(
                     content: $this->content,
                     to: $this->sanitizeNumber($this->to),
                     from: $this->from,
@@ -222,6 +228,20 @@ class Message
             Log::error("JasminClient: ". $e->getMessage());
             throw $e;
         }
+    }
+
+    /**
+     * @param string|null $username
+     * @param string|null $password
+     * @param string|null $url
+     * @return $this
+     */
+    public function withCredentials(?string $username = null, ?string $password = null, ?string $url = null): self
+    {
+        $this->routeUsername = $username ?? $this->routeUsername;
+        $this->routePassword = $password ?? $this->routePassword;
+        $this->routeUrl = $url ?? $this->routeUrl;
+        return $this;
     }
 
     public function toArray(): array

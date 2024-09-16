@@ -16,6 +16,10 @@ class Batch
     private array $globals;
     private array $messages;
 
+    private ?string $routeUsername;
+    private ?string $routePassword;
+    private ?string $routeUrl;
+
     public function __construct(?array $globals = null, ?array $messages = null)
     {
         $this->messages = $messages ?? [];
@@ -128,6 +132,20 @@ class Batch
     public function from(string $from): self
     {
         $this->globals['from'] = $from;
+        return $this;
+    }
+
+    /**
+     * @param string|null $username
+     * @param string|null $password
+     * @param string|null $url
+     * @return $this
+     */
+    public function withCredentials(?string $username = null, ?string $password = null, ?string $url = null): self
+    {
+        $this->routeUsername = $username ?? $this->routeUsername;
+        $this->routePassword = $password ?? $this->routePassword;
+        $this->routeUrl = $url ?? $this->routeUrl;
         return $this;
     }
 
