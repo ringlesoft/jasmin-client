@@ -3,7 +3,7 @@
 namespace RingleSoft\JasminClient\Services;
 
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -134,6 +134,9 @@ class HttpService implements JasminHttpContract
 
     /**
      * @param string|null $to
+     * @param string|null $from
+     * @param string|null $coding
+     * @param string|null $content
      * @return JasminResponse
      * @throws JasminClientException
      */
@@ -176,9 +179,9 @@ class HttpService implements JasminHttpContract
     /**
      * @param Request $request
      * @param callback(IncomingMessage $message): bool $callback
-     * @return JsonResponse
+     * @return Response
      */
-    public function receiveMessage(Request $request, callable $callback): JsonResponse
+    public function receiveMessage(Request $request, callable $callback): Response
     {
         $rules = [
             'id' => ['required', 'string'],
@@ -195,7 +198,7 @@ class HttpService implements JasminHttpContract
         $validator = Validator::make($request->input(), $rules);
         if ($validator->fails()) {
             Log::info("Invalid request received from jasmin");
-            return new JsonResponse("Invalid Request", 400);
+            return new Response("Invalid Request", 400);
         }
         $IncomingMessage = new IncomingMessage(
             id: $request->input('id'),
@@ -209,23 +212,23 @@ class HttpService implements JasminHttpContract
             binary: $request->input('binary')
         );
         if ($callback($IncomingMessage)) {
-            return new JsonResponse("ACK/Jasmin", 200);
+            return new Response("ACK/Jasmin", 200);
         }
-        return new JsonResponse("FAIL/Jasmin", 400);
+        return new Response("FAIL/Jasmin", 400);
     }
 
     /**
      * @param Request $request
      * @param callback(DeliveryCallback $dlr): bool $callback
-     * @return JsonResponse
+     * @return Response
      */
-    public function receiveDlrCallback(Request $request, callable $callback): JsonResponse
+    public function receiveDlrCallback(Request $request, callable $callback): Response
     {
         $validator = Validator::make($request->input(), DeliveryCallback::rules());
         if ($validator->fails()) {
             Log::info("JasminClient: Invalid request received from jasmin");
             Log::debug($validator->errors()->all());
-            return new JsonResponse("Invalid Request", 400);
+            return new Response("Invalid Request", 400);
         }
         $dlr = new DeliveryCallback(
             id: $request->input('id'),
@@ -241,8 +244,8 @@ class HttpService implements JasminHttpContract
             text: $request->input('text')
         );
         if ($callback($dlr)) {
-            return new JsonResponse("ACK/Jasmin", 200);
+            return new Response("ACK/Jasmin", 200, ['Content-Type' => 'text/plain']);
         }
-        return new JsonResponse("FAIL/Jasmin", 400);
+        return new Response("FAIL/Jasmin", 400, ['Content-Type' => 'text/plain']);
     }
 }

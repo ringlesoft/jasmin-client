@@ -4,6 +4,7 @@ namespace RingleSoft\JasminClient\Contracts;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\Callbacks\DeliveryCallback;
 use RingleSoft\JasminClient\Models\IncomingMessage;
@@ -55,16 +56,16 @@ interface JasminHttpContract
     /**
      * @param Request $request
      * @param callable(DeliveryCallback $dlr): bool $callback
-     * @return JsonResponse
+     * @return Response
      */
-    public function receiveDlrCallback(Request $request, callable $callback): JsonResponse;
+    public function receiveDlrCallback(Request $request, callable $callback): Response;
 
     // Receive MO message
 
     /**
      * @param Request $request
      * @param callable(IncomingMessage $message): bool $callback
-     * @return JsonResponse
+     * @return Response
      */
-    public function receiveMessage(Request $request, callable $callback): JsonResponse;
+    public function receiveMessage(Request $request, callable $callback): Response;
 }
