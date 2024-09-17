@@ -220,10 +220,8 @@ class Message
             }
             if($response->isSuccessful()) {
                 return SentMessage::fromResponse($response);
-            } else {
-                throw new JasminClientException("Failed to send message");
             }
-
+            throw new JasminClientException("Failed to send message");
         } catch (JasminClientException $e) {
             Log::error("JasminClient: ". $e->getMessage());
             throw $e;

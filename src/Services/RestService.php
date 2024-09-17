@@ -156,13 +156,16 @@ class RestService implements JasminRestContract
         return JasminResponse::from($response);
     }
 
+    /**
+     * @return JasminResponse
+     * @throws JasminClientException
+     */
     public function ping(): JasminResponse
     {
         $headers = $this->makeHeaders();
         $url = $this->url . '/secure/ping';
         try {
             $response = Http::withHeaders($headers)->get($url);
-            dd($response->body());
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
         }

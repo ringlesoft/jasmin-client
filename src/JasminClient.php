@@ -2,7 +2,7 @@
 
 namespace RingleSoft\JasminClient;
 
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use RingleSoft\JasminClient\Models\Batch;
 use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
@@ -66,9 +66,9 @@ class JasminClient
      * Receive a batch callback from the jasmin gateway
      * @param Request $request
      * @param callable(BatchCallback $batch): bool $callback
-     * @return JsonResponse
+     * @return Response
      */
-    public static function receiveBatchCallback(Request $request, callable $callback): JsonResponse
+    public static function receiveBatchCallback(Request $request, callable $callback): Response
     {
         return self::rest()->receiveBatchCallback($request, $callback);
     }
@@ -77,9 +77,9 @@ class JasminClient
      * Receive a dlr callback from the jasmin gateway
      * @param Request $request
      * @param callable(DeliveryCallback $dlr): bool $callback
-     * @return JsonResponse
+     * @return Response
      */
-    public static function receiveDlrCallback(Request $request, callable $callback): JsonResponse
+    public static function receiveDlrCallback(Request $request, callable $callback): Response
     {
         return self::http()->receiveDlrCallback($request, $callback);
     }
@@ -88,9 +88,9 @@ class JasminClient
      * Receive a MO message callback from the jasmin gateway
      * @param Request $request
      * @param callable(IncomingMessage $message): bool $callback
-     * @return JsonResponse
+     * @return Response
      */
-    public static function receiveMessage(Request $request, callable $callback): JsonResponse
+    public static function receiveMessage(Request $request, callable $callback): Response
     {
         return self::http()->receiveMessage($request, $callback);
     }
