@@ -87,7 +87,7 @@ class DeliveryCallback
     public static function rules(): array
     {
         return [
-            'id' => 'required|uuid',
+            'id' => 'required|string',
             'message_status' => 'required',
             'level' => 'required|integer|in:1,2,3',
             'connector' => 'required|string',
