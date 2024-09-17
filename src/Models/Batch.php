@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\Log;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Facades\JasminClient;
 use RingleSoft\JasminClient\Models\Jasmin\SentBatch;
-use RingleSoft\JasminClient\Models\Responses\JasminResponse;
-use RingleSoft\JasminClient\Models\Responses\JasminRestResponse;
 
 class Batch
 {
@@ -197,7 +195,8 @@ class Batch
 
     /**
      * Send the batch
-     * @return JasminResponse|null
+     * @return SentBatch
+     * @throws JasminClientException
      */
     public function send(): SentBatch
     {
@@ -211,12 +210,11 @@ class Batch
             );
             if($response->isSuccessful()) {
                 return SentBatch::fromResponse($response);
-            } else {
-                throw new JasminClientException("Failed to send batch to jasmin");
             }
+            throw new JasminClientException("Failed to send batch to jasmin");
         } catch (JasminClientException $e) {
             Log::error($e->getMessage());
-            return new JasminRestResponse($e->getMessage(), $e->getMessage(), null);
+            throw $e;
         }
     }
 }

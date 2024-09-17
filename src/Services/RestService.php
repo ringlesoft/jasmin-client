@@ -3,8 +3,8 @@
 namespace RingleSoft\JasminClient\Services;
 
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +14,7 @@ use RingleSoft\JasminClient\Contracts\JasminRestContract;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
 use RingleSoft\JasminClient\Models\Responses\JasminResponse;
+use RingleSoft\JasminClient\Validators\RestBatchValidator;
 use RingleSoft\JasminClient\Validators\RestMessageValidator;
 
 class RestService implements JasminRestContract
@@ -92,6 +93,14 @@ class RestService implements JasminRestContract
         return JasminResponse::from($response);
     }
 
+    /**
+     * @param array $messages
+     * @param array|null $globals
+     * @param array|null $batchConfig
+     * @param bool|null $asBinary
+     * @return JasminResponse
+     * @throws JasminClientException
+     */
     public function sendBatch(array $messages, ?array $globals, ?array $batchConfig, ?bool $asBinary = false): JasminResponse
     {
         $url = $this->url . '/secure/sendbatch';
@@ -101,18 +110,16 @@ class RestService implements JasminRestContract
             "batch_config" => $batchConfig
         ];
 
-//        $validator = RestBatchValidator::validate($data);
-//        if ($validator->fails()) {
-//            Log::info("Data validation failed: ");
-//            return new JasminResponse("Data validation failed",
-//                "failed", $validator->errors()->all());
-//        }
+        $validator = RestBatchValidator::validate($data);
+        if ($validator->fails()) {
+            Log::info("Data validation failed: ");
+            throw ValidationException::withMessages($validator->errors()->all());
+        }
 
         try {
             $response = Http::withHeaders($this->makeHeaders())->post($url, $data);
         } catch (ConnectionException $e) {
             Log::debug($e);
-            dd($e);
             throw JasminClientException::from($e);
         }
         return JasminResponse::from($response);
@@ -149,13 +156,16 @@ class RestService implements JasminRestContract
         return JasminResponse::from($response);
     }
 
+    /**
+     * @return JasminResponse
+     * @throws JasminClientException
+     */
     public function ping(): JasminResponse
     {
         $headers = $this->makeHeaders();
         $url = $this->url . '/secure/ping';
         try {
             $response = Http::withHeaders($headers)->get($url);
-            dd($response->body());
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
         }
@@ -165,14 +175,14 @@ class RestService implements JasminRestContract
     /**
      * @param Request $request
      * @param callback(BatchCallback $batch): bool $callback
-     * @return JsonResponse
+     * @return Response
      */
-    public function receiveBatchCallback(Request $request, callable $callback): JsonResponse
+    public function receiveBatchCallback(Request $request, callable $callback): Response
     {
         $validator = Validator::make($request->input(), BatchCallback::rules());
         if ($validator->fails()) {
             Log::info("Invalid request received from jasmin");
-            return new JsonResponse("Invalid Request", 400);
+            return new Response("Invalid Request", 400);
         }
         $batchCallback = new BatchCallback(
             batchId: $request->input('batchId'),
@@ -181,8 +191,8 @@ class RestService implements JasminRestContract
             statusText: $request->input('statusText')
         );
         if ($callback($batchCallback)) {
-            return new JsonResponse("ACK/Jasmin", 200);
+            return new Response("ACK/Jasmin", 200);
         }
-        return new JsonResponse("FAIL/Jasmin", 400);
+        return new Response("FAIL/Jasmin", 400);
     }
 }
