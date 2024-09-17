@@ -93,9 +93,9 @@ class Message
      */
     private ?string $via;
 
-    private ?string $routeUsername;
-    private ?string $routePassword;
-    private ?string $routeUrl;
+    private ?string $routeUsername = null;
+    private ?string $routePassword = null;
+    private ?string $routeUrl = null;
 
     public function __construct(?string $to = null, ?string $from = null, ?string $content = null, ?bool $dlr = null, ?string $dlrUrl = null, ?string $dlrLevel = null, ?string $dlrMethod = null)
     {

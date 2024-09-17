@@ -16,9 +16,9 @@ class Batch
     private array $globals;
     private array $messages;
 
-    private ?string $routeUsername;
-    private ?string $routePassword;
-    private ?string $routeUrl;
+    private ?string $routeUsername = null;
+    private ?string $routePassword = null;
+    private ?string $routeUrl = null;
 
     public function __construct(?array $globals = null, ?array $messages = null)
     {
