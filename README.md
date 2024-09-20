@@ -77,12 +77,42 @@ $sms = JasminClient::message()
 - Returns  `RingleSoft\JasminClient\Models\Jasmin\SentBatch`
 
 ### Handling Delivery Statuses
+This package provides a streamlined way to handle delivery statuses.
+
+```php
+Class DlrController extends Controller
+{
+    public function handleDlr(Request $request)
+    {
+        return JasminClient::receiveDlrCallback($request, function(DeliveryCallback $dlr) {
+            // do something with the dlr and return true for success or false for failure
+            // For example, you can dispatch a job to process the Delivery Report
+            return true;
+        });
+    }
+}
+```
 
 ### Handling Batch Callback Requests
+When messages are sent in a batch, Jasmin responds with the ID of the batch created (`batchId`) and enqueue the messages.
+When each message is sent to SMC, jasmin fires a callback (batch callback) with `messageId` of each message within the
+batch.
 
-When messages are sent in a batch, Jasmin responds with the ID of the batch created and enqueue the messages.
-When each message is sent to SMC, jasmin fires a callback (batch callback) with messageIds of each message within the
-batch
+To handle batch callbacks, you can use the `receiveBatchCallback` method.
+```php
+Class DlrController extends Controller
+{
+    public function handleDlr(Request $request)
+    {
+        return JasminClient::receiveDlrCallback($request, function(DeliveryCallback $dlr) {
+            // do something with the dlr and return true for success or false for failure
+            // For example, you can dispatch a job to process Batch Callback
+            return true;
+        });
+    }
+}
+```
+
 
 ### Checking rates (Http & Rest)
 ```php
