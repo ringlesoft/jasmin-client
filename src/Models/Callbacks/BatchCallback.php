@@ -37,9 +37,10 @@ class BatchCallback
 
     public function getMessageId(): string
     {
-        $openingChar = "“";
-        $closingChar = "”";
-        return Str::of($this->statusText)->after($openingChar)->before($closingChar)->toString();
+        $text = $this->statusText;
+        str_replace('“', '"', $text);
+        str_replace('”', '"', $text);
+        return Str::of($text)->after('"')->before('"')->toString();
     }
 
     public function getBatchId(): string

@@ -31,5 +31,13 @@ class SentBatch
         throw new RuntimeException("Invalid response from jasmin");
     }
 
+    public function toArray(): array
+    {
+        return [
+            'batchId' => $this->batchId,
+            'messageCount' => $this->messageCount
+        ];
+    }
+
 
 }
