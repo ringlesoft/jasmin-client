@@ -10,6 +10,8 @@ use Illuminate\Validation\Rules\RequiredIf;
 class RestBatchValidator
 {
 
+    private array $data = [];
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -17,7 +19,7 @@ class RestBatchValidator
      */
     public function rules(): array
     {
-        return  [
+        return [
             'batch_config' => 'nullable|array',
             'batch_config.callback_url' => 'nullable|url',
             'batch_config.errback_url' => 'nullable|url',
@@ -27,10 +29,7 @@ class RestBatchValidator
             'globals.dlr' => 'required|in:yes,no',
             'globals.dlr-url' => 'required|url',
             'messages.*.from' => [
-                'nullable',
-                new RequiredIf(function ($input, $value) {
-                    return is_null(data_get($input, 'globals.from'));
-                }),
+                (is_null(data_get($this->data, 'globals.from')) ? 'required' : 'nullable'),
                 'string',
             ],
             'messages.*.to' => 'required|array',
@@ -46,7 +45,7 @@ class RestBatchValidator
      */
     public function messages(): array
     {
-        return  [
+        return [
             'globals.from.required' => 'The from field is required.',
             'globals.dlr-level.required' => 'The dlr-level field is required.',
             'globals.dlr.required' => 'The dlr field is required.',
@@ -64,6 +63,7 @@ class RestBatchValidator
 
     private function validateData($data): \Illuminate\Validation\Validator
     {
+        $this->data = $data;
         return Validator::make($data, $this->rules(), $this->messages());
     }
 
