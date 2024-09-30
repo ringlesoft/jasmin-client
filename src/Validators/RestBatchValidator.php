@@ -24,12 +24,12 @@ class RestBatchValidator
             'globals' => 'nullable|array',
             'globals.from' => 'nullable|string',
             'globals.dlr-level' => 'required|integer',
-            'globals.dlr' => 'required|boolean',
+            'globals.dlr' => 'required|in:yes,no',
             'globals.dlr-url' => 'required|url',
             'messages.*.from' => [
                 'nullable',
-                new RequiredIf(function ($input) {
-                    return is_null($input['globals.from']);
+                new RequiredIf(function ($input, $value) {
+                    return is_null(data_get($input, 'globals.from'));
                 }),
                 'string',
             ],
