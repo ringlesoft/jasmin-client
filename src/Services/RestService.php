@@ -53,6 +53,11 @@ class RestService implements JasminRestContract
      * @param string $dlrLevel
      * @param string|null $dlrMethod
      * @param bool|null $asBinary
+     * @param int|null $priority
+     * @param string|null $sdt
+     * @param string|null $validityPeriod
+     * @param string|null $tags
+     * @param int|null $coding
      * @return JasminResponse
      * @throws JasminClientException
      */
@@ -64,7 +69,12 @@ class RestService implements JasminRestContract
         string $dlrUrl,
         string $dlrLevel,
         ?string $dlrMethod,
-        ?bool  $asBinary = false
+        ?bool  $asBinary = false,
+        ?int $priority = null,
+        ?string $sdt = null,
+        ?string $validityPeriod = null,
+        ?string $tags = null,
+        ?int $coding = null
     ): JasminResponse
     {
         $headers = $this->makeHeaders();
@@ -77,6 +87,11 @@ class RestService implements JasminRestContract
             "dlr-url" => $dlrUrl,
             "dlr-level" => $dlrLevel,
             "dlr-method" => $dlrMethod,
+            "priority" => $priority,
+            "sdt" => $sdt,
+            "validity-period" => $validityPeriod,
+            "tags" => $tags,
+            "coding" => $coding
         ];
         $data = array_filter($data);
         $validator = RestMessageValidator::validate($data);
