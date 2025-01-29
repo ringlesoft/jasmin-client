@@ -105,6 +105,9 @@ class HttpService implements JasminHttpContract
 
         try {
             $response = Http::withHeaders($this->makeHeaders())->post($url, $data);
+            if(!$response->ok() && Config::get('jasmin.log_http_failures')){
+                Log::info("HTTP Response failed: " . $response->body());
+            }
         } catch (ConnectionException $e) {
             Log::debug($e);
             throw JasminClientException::from($e);

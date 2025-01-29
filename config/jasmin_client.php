@@ -11,4 +11,6 @@ return [
     'default_dlr_method' => env('JASMIN_DEFAULT_DLR_METHOD', 'POST'),
     'default_dlr_level' => env('JASMIN_DEFAULT_DLR_LEVEL', 2),
     'batch_chunk_size' => env('JASMIN_BATCH_CHUNK_SIZE', 10000),
+
+    'log_http_failures' => env('JASMIN_LOG_HTTP_FAILURES', true),
 ];
