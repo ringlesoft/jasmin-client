@@ -13,6 +13,7 @@ class Message
 {
 
     private bool $isBinary = false;
+
     /**
      * Destination address, only one address is supported per request
      * @var string|null
@@ -27,21 +28,25 @@ class Message
     public ?string $from;
 
     /**
+     * Message content
      * @var string|null
      */
     public ?string $content;
 
     /**
+     * Whether to request a delivery report (DLR) from the SMSC
      * @var bool
      */
     public bool $dlr = true;
 
     /**
+     * If a DLR is requested (dlr = ‘yes’), dlr-url MUST be set, if not, dlr value is reconsidered as ‘no’
      * @var string|mixed|null
      */
     public ?string $dlrUrl;
 
     /**
+     * Delivery Report Level to be requested from the SMSC
      * 1: SMS-C level, 2: Terminal level, 3: Both
      * @var int|null
      */
@@ -54,6 +59,7 @@ class Message
     private ?int $coding = 0;
 
     /**
+     * Default is 0 (lowest priority)
      * @var int|null
      */
     private ?int $priority = 0;
@@ -79,6 +85,7 @@ class Message
     private ?string $dlrMethod = 'GET';
 
     /**
+     * Will tag the routable to help interceptor or router enable specific business logics.
      * @var int|null
      */
     private ?int $tags = null;
@@ -174,12 +181,67 @@ class Message
         return $this;
     }
 
+    /**
+     * Set the route to send the message
+     * @param string $route
+     * @param string|null $username
+     * @param string|null $password
+     * @param string|null $url
+     * @return $this
+     */
     public function via(string $route, ?string $username = null, ?string $password = null, ?string $url = null): self
     {
         $this->via = $route;
         return $this;
     }
 
+    /**
+     * Set the priority of the message
+     * @param int $priority
+     * @return $this
+     */
+    public function priority(int $priority): self
+    {
+        $this->priority = min($priority, 3);
+        return $this;
+    }
+
+    public function sdt(?string $sdt): self
+    {
+        $this->sdt = $sdt;
+        return $this;
+    }
+
+    /**
+     * @param int|null $validityPeriod
+     * @return $this
+     */
+    public function validityPeriod(?int $validityPeriod): self
+    {
+        $this->validityPeriod = $validityPeriod;
+        return $this;
+    }
+
+    /**
+     * Set the tags of the message
+     * @param string|null $tags
+     * @return $this
+     */
+    public function tags(?string $tags): self
+    {
+        $this->tags = $tags;
+        return $this;
+    }
+
+    /**
+     * @param int|null $coding
+     * @return $this
+     */
+    public function coding(?int $coding): self
+    {
+        $this->coding = min(($coding ?? 0) , 14);
+        return $this;
+    }
 
     /**
      * @return SentMessage
