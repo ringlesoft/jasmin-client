@@ -277,7 +277,12 @@ class Message
                     dlr: $this->dlr ? 'yes' : 'no',
                     dlrUrl: $this->dlrUrl,
                     dlrLevel: $this->dlrLevel,
-                    dlrMethod: $this->dlrMethod
+                    dlrMethod: $this->dlrMethod,
+                    priority: $this->priority,
+                    sdt: $this->sdt,
+                    validityPeriod: $this->validityPeriod,
+                    tags: $this->tags,
+                    coding: $this->coding
                 );
             }
             if($response->isSuccessful()) {
