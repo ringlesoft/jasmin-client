@@ -192,6 +192,12 @@ class Message
     public function via(string $route, ?string $username = null, ?string $password = null, ?string $url = null): self
     {
         $this->via = $route;
+        if($username) {
+            $this->routeUsername = $username;
+        }
+        if($password) {
+            $this->routePassword = $password;
+        }
         return $this;
     }
 
