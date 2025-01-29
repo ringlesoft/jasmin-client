@@ -101,6 +101,9 @@ class RestService implements JasminRestContract
         }
         try {
             $response = Http::withHeaders($headers)->post($url, $data);
+            if(!$response->ok() && Config::get('jasmin.log_http_failures')){
+                Log::info("HTTP Response failed: " . $response->body());
+            }
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
         }
