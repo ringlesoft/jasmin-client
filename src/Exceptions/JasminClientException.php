@@ -8,9 +8,9 @@ use Throwable;
 class JasminClientException extends Exception
 {
 
-    public static function from(Exception|Throwable $exception): JasminClientException
+    public static function from(Exception|Throwable $exception, ?String $message = null): JasminClientException
     {
-        return new self($exception->getMessage(), $exception->getCode() ?? 0, $exception);
+        return new self($message ?? $exception->getMessage(), $exception->getCode() ?? 0, $exception);
     }
 
 }
