@@ -3,6 +3,7 @@
 
 namespace RingleSoft\JasminClient\Validators;
 
+use Closure;
 use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Validation\Rules\RequiredIf;
@@ -32,7 +33,21 @@ class RestBatchValidator
                 (is_null(data_get($this->data, 'globals.from')) ? 'required' : 'nullable'),
                 'string',
             ],
-            'messages.*.to' => 'required|array',
+            'messages.*.to' => [
+                'required',
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    if (is_array($value)) {
+                        if ($value === []) {
+                            $fail('The to field must contain at least one number.');
+                        }
+                        return;
+                    }
+
+                    if (!is_numeric($value)) {
+                        $fail('The to field must contain only numbers.');
+                    }
+                },
+            ],
             'messages.*.to.*' => 'required|numeric',
             'messages.*.content' => 'required|string',
         ];
