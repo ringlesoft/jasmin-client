@@ -4,6 +4,7 @@ namespace RingleSoft\JasminClient;
 
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\Batch;
 use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
 use RingleSoft\JasminClient\Models\Callbacks\DeliveryCallback;
@@ -39,11 +40,15 @@ class JasminClient
     }
 
     /**
+     * @param string|null $username
+     * @param string|null $password
+     * @param array|string|null $hosts
      * @return SmppService
+     * @throws JasminClientException
      */
-    public static function smpp(): SmppService
+    public static function smpp(?string $username = null, ?string $password = null, array|string|null $hosts = null): SmppService
     {
-        return new SmppService();
+        return new SmppService($username, $password, $hosts);
     }
 
     /**
