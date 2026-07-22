@@ -3,10 +3,10 @@
 namespace RingleSoft\JasminClient\Models;
 
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Facades\JasminClient;
 use RingleSoft\JasminClient\Models\Jasmin\SentBatch;
+use RingleSoft\JasminClient\Utility\Logger;
 
 class Batch
 {
@@ -234,7 +234,7 @@ class Batch
             }
             throw new JasminClientException("Failed to send batch to jasmin");
         } catch (JasminClientException $e) {
-            Log::error($e->getMessage());
+            Logger::error('JasminClient batch send failed.', ['exception' => $e]);
             throw $e;
         }
     }

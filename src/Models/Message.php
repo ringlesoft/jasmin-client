@@ -4,10 +4,10 @@ namespace RingleSoft\JasminClient\Models;
 
 
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Facades\JasminClient;
 use RingleSoft\JasminClient\Models\Jasmin\SentMessage;
+use RingleSoft\JasminClient\Utility\Logger;
 
 class Message
 {
@@ -308,7 +308,7 @@ class Message
             }
             throw new JasminClientException("Failed to send message");
         } catch (JasminClientException $e) {
-            Log::error("JasminClient: ". $e->getMessage());
+            Logger::error('JasminClient message send failed.', ['exception' => $e]);
             throw $e;
         }
     }

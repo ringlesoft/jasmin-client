@@ -13,7 +13,7 @@ use RingleSoft\JasminClient\Events\SmppMessageReceived;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\SmppDeliveryReport;
 use RingleSoft\JasminClient\Models\SmppIncomingMessage;
-use RingleSoft\JasminCLient\Utility\Logger;
+use RingleSoft\JasminClient\Utility\Logger;
 use Throwable;
 
 class SmppReceiver
@@ -50,7 +50,7 @@ class SmppReceiver
             });
         } catch (Throwable $exception) {
             $this->events->dispatch(new SmppConnectionFailed($exception));
-//            Logger::error('Unable to receive SMPP messages.'. $exception->getMessage());
+            Logger::error('Unable to receive SMPP messages.', ['exception' => $exception]);
             throw JasminClientException::from($exception, 'Unable to receive SMPP messages.');
         }
     }

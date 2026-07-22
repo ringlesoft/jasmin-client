@@ -13,6 +13,10 @@ return [
 
     'log_http_failures' => env('JASMIN_LOG_HTTP_FAILURES', true),
 
+    'logging' => [
+        'enabled' => env('JASMIN_LOGGING_ENABLED', true),
+    ],
+
     'smpp' => [
         'hosts' => array_values(array_filter(explode(',', env('JASMIN_SMPP_HOSTS', '127.0.0.1:2775')))),
         'username' => env('JASMIN_SMPP_USERNAME'),

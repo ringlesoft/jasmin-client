@@ -3,9 +3,9 @@
 namespace RingleSoft\JasminClient\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Services\SmppReceiver;
+use RingleSoft\JasminClient\Utility\Logger;
 
 class ConsumeSmppCommand extends Command
 {
@@ -18,7 +18,7 @@ class ConsumeSmppCommand extends Command
             try {
                 $receiver->listenOnce();
             } catch (JasminClientException $exception) {
-                Log::error('Jasmin SMPP receiver failed.', ['exception' => $exception]);
+                Logger::error('Jasmin SMPP receiver failed.', ['exception' => $exception]);
 
                 if ($this->option('once')) {
                     return self::FAILURE;
