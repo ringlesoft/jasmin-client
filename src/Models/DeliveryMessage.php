@@ -32,6 +32,10 @@ class DeliveryMessage
     }
 
 
+    /**
+     * @param DeliveryCallback $callback
+     * @return self
+     */
     public static function fromCallback(DeliveryCallback $callback): self
     {
         return new self(
@@ -46,17 +50,23 @@ class DeliveryMessage
         );
     }
 
-    public static function fromSmppDeliveyr(DeliverReceiptSm $delivery): self
+    /**
+     * @param DeliverReceiptSm $delivery
+     * @return self
+     */
+    public static function fromSmppDelivery(DeliverReceiptSm $delivery): self
     {
+        $report = SmppDeliveryReport::fromPdu($delivery);
+
         return new self(
-            getMessageId: $delivery->msgId,
-            submittedCount: $delivery->state,
-            deliveredCount: $delivery->state,
-            submittedDate: $delivery->submitDate,
-            doneDate: $delivery->doneDate,
-            messageStatus: $delivery->state,
-            error: $delivery->state,
-            text: $delivery->state
+            getMessageId: $report->messageId,
+            submittedCount: 0,
+            deliveredCount: $report->status === 'DELIVRD' ? 1 : 0,
+            submittedDate: $report->submittedAt?->format('Y-m-d H:i:s') ?? '',
+            doneDate: $report->deliveredAt?->format('Y-m-d H:i:s') ?? '',
+            messageStatus: $report->status,
+            error: $report->errorCode === null ? '' : (string) $report->errorCode,
+            text: $report->rawReceipt,
         );
     }
 }
