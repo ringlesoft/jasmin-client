@@ -38,6 +38,8 @@
         "illuminate/support": "^10|^11.23|^12|^13",
         "illuminate/collections": "^10|^11.23|^12|^13",
         "illuminate/http": "^10|^11.23|^12|^13",
+        "illuminate/console": "^10|^11.23|^12|^13",
+        "illuminate/events": "^10|^11.23|^12|^13",
         "illuminate/validation": "^10|^11.23|^12|^13",
         "glushkovds/php-smpp": "^0.7.1"
     }
