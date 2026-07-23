@@ -229,10 +229,7 @@ class Batch
                     globals: $data['globals'],
                     batchConfig: $data['batch_config']
                 );
-            if ($response->isSuccessful()) {
                 return SentBatch::fromResponse($response);
-            }
-            throw new JasminClientException("Failed to send batch to jasmin");
         } catch (JasminClientException $e) {
             Logger::error('JasminClient batch send failed.', ['exception' => $e]);
             throw $e;
