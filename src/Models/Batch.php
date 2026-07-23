@@ -34,12 +34,12 @@ class Batch
 
     /**
      * Add messages to the batch
-     * @param array $messages
+     * @param array $messages messages to add [["to" => "123", "content" => "ABC"], ...]
      * @return $this
      */
-    public function messages(array $messages): self
+    public function addMessages(array $messages): self
     {
-        $this->messages = $messages;
+        $this->messages = array_map(static fn($m) => (($m instanceof Message) ? $m->toArray() : (array)$m), $messages);
         return $this;
     }
 
@@ -94,7 +94,7 @@ class Batch
      */
     public function trackDelivery($value = true): self
     {
-        $this->globals['dlr'] = $value ? 'yes' :'no';
+        $this->globals['dlr'] = $value ? 'yes' : 'no';
         return $this;
     }
 
@@ -116,8 +116,8 @@ class Batch
      */
     public function deliveryLevel(int $level): self
     {
-        if($level > 0 && $level < 4){
-        $this->globals['dlr-level'] = $level;
+        if ($level > 0 && $level < 4) {
+            $this->globals['dlr-level'] = $level;
         }
         return $this;
     }
@@ -223,13 +223,13 @@ class Batch
         $this->combineMessages();
         $data = $this->toArray();
         try {
-            $response =  JasminClient::rest($this->routeUsername, $this->routePassword, $this->routeUrl)
+            $response = JasminClient::rest($this->routeUsername, $this->routePassword, $this->routeUrl)
                 ->sendBatch(
-                messages: $data['messages'],
-                globals: $data['globals'],
-                batchConfig: $data['batch_config']
-            );
-            if($response->isSuccessful()) {
+                    messages: $data['messages'],
+                    globals: $data['globals'],
+                    batchConfig: $data['batch_config']
+                );
+            if ($response->isSuccessful()) {
                 return SentBatch::fromResponse($response);
             }
             throw new JasminClientException("Failed to send batch to jasmin");

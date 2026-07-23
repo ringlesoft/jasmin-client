@@ -10,7 +10,7 @@ A Laravel package for seamless integration with Jasmin SMS Gateway, supporting H
 
 - Easy-to-use interface for sending and receiving SMS
 - Support for HTTP and REST API jasmin options
-- SMPP support is coming soon
+- SMPP is still experimental: Try SMPP only for non-critical applications
 - Delivery report handling
 
 ## Installation
