@@ -25,7 +25,7 @@ class RestService implements JasminRestContract
 
     public function __construct(?string $username = null, ?string $password = null, ?string $url = null)
     {
-        $this->url = $url ?? Config::get('jasmin_client.url');
+        $this->url = $url ?? Config::get('jasmin_client.rest_url');
         $this->username = $username ?? Config::get('jasmin_client.username');
         $this->password = $password ?? Config::get('jasmin_client.password');
     }

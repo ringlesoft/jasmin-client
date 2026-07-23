@@ -25,7 +25,7 @@ class SmppService implements JasminSmppContract
         ?SmppTransport $transport = null,
     ) {
         $config = Config::get('jasmin_client.smpp', []);
-        $configuredHosts = $config['hosts'] ?? [];
+        $configuredHosts = Config::get('jasmin_client.smpp_url', $config['hosts'] ?? []);
         $resolvedHosts = $this->normalizeHosts($hosts ?? $configuredHosts);
         $resolvedUsername = $username ?? ($config['username'] ?? null);
         $resolvedPassword = $password ?? ($config['password'] ?? null);

@@ -23,7 +23,7 @@ class SmppReceiver
     public function __construct(private readonly Dispatcher $events)
     {
         $config = Config::get('jasmin_client.smpp', []);
-        $hosts = $config['hosts'] ?? [];
+        $hosts = array_values(array_filter(explode(',', (string) Config::get('jasmin_client.smpp_url', implode(',', $config['hosts'] ?? [])))));
         $username = $config['username'] ?? null;
         $password = $config['password'] ?? null;
 
