@@ -1,6 +1,9 @@
 <?php
 return [
     'url' => env('JASMIN_BASE_URL', 'http://127.0.0.1:1404'),
+    'http_url' => env('JASMIN_HTTP_URL', env('JASMIN_BASE_URL')), // Backward Compatible
+    'rest_url' => env('JASMIN_REST_URL', env('JASMIN_BASE_URL')), // Backward Compatible
+    'smpp_url' => env('JASMIN_SMPP_URL', env('JASMIN_BASE_URL')), // Backward Compatible
     'username' => env('JASMIN_USERNAME', "jasminadmin"),
     'password' => env('JASMIN_PASSWORD', "jasminpwd"),
     'dlr_callback_url' => env('JASMIN_DLR_CALLBACK_URL', 'http://localhost/jasmin-callback'),
