@@ -232,6 +232,9 @@ class Batch
                 return SentBatch::fromResponse($response);
         } catch (JasminClientException $e) {
             Logger::error('JasminClient batch send failed.', ['exception' => $e]);
+            if ($response ?? null) {
+                Logger::error('Returned Response.', ['exception' => $response?->response?->getBody()]);
+            }
             throw $e;
         }
     }

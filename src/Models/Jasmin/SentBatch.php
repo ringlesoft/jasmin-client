@@ -2,6 +2,7 @@
 
 namespace RingleSoft\JasminClient\Models\Jasmin;
 
+use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Models\Responses\JasminResponse;
 use RuntimeException;
 
@@ -19,6 +20,7 @@ class SentBatch
     /**
      * @param JasminResponse $response
      * @return self
+     * @throws JasminClientException
      */
     public static function fromResponse(JasminResponse $response): self
     {
@@ -28,7 +30,7 @@ class SentBatch
             $messageCount = $data['messageCount'] ?? 0;
             return new self($batchId, $messageCount);
         }
-        throw new RuntimeException("Invalid response from jasmin");
+        throw new JasminClientException("Invalid response from jasmin");
     }
 
     public function toArray(): array
