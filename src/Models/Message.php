@@ -4,10 +4,10 @@ namespace RingleSoft\JasminClient\Models;
 
 
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
 use RingleSoft\JasminClient\Facades\JasminClient;
 use RingleSoft\JasminClient\Models\Jasmin\SentMessage;
+use RingleSoft\JasminClient\Utility\Logger;
 
 class Message
 {
@@ -191,12 +191,15 @@ class Message
      */
     public function via(string $route, ?string $username = null, ?string $password = null, ?string $url = null): self
     {
-        $this->via = $route;
+        $this->via = strtolower($route);
         if($username) {
             $this->routeUsername = $username;
         }
         if($password) {
             $this->routePassword = $password;
+        }
+        if($url) {
+            $this->routeUrl = $url;
         }
         return $this;
     }
@@ -257,6 +260,15 @@ class Message
     {
         // TODO check if all required fields are set
         try {
+            if ($this->via === 'smpp') {
+                return JasminClient::smpp($this->routeUsername, $this->routePassword, $this->routeUrl)
+                    ->sendMessage(
+                        to: $this->to ?? '',
+                        content: $this->content ?? '',
+                        from: $this->from ?? '',
+                    );
+            }
+
             if ($this->via === 'http') {
                 $response = JasminClient::http($this->routeUsername, $this->routePassword, $this->routeUrl)
                     ->sendMessage(
@@ -296,7 +308,7 @@ class Message
             }
             throw new JasminClientException("Failed to send message");
         } catch (JasminClientException $e) {
-            Log::error("JasminClient: ". $e->getMessage());
+            Logger::error('JasminClient message send failed.', ['exception' => $e]);
             throw $e;
         }
     }

@@ -1,7 +1,6 @@
 <?php
 return [
     'url' => env('JASMIN_BASE_URL', 'http://127.0.0.1:1404'),
-    'smpp_url' => env('JASMIN_SMPP_URL', 'http://127.0.0.1'),
     'username' => env('JASMIN_USERNAME', "jasminadmin"),
     'password' => env('JASMIN_PASSWORD', "jasminpwd"),
     'dlr_callback_url' => env('JASMIN_DLR_CALLBACK_URL', 'http://localhost/jasmin-callback'),
@@ -13,4 +12,18 @@ return [
     'batch_chunk_size' => env('JASMIN_BATCH_CHUNK_SIZE', 10000),
 
     'log_http_failures' => env('JASMIN_LOG_HTTP_FAILURES', true),
+
+    'logging' => [
+        'enabled' => env('JASMIN_LOGGING_ENABLED', true),
+    ],
+
+    'smpp' => [
+        'hosts' => array_values(array_filter(explode(',', env('JASMIN_SMPP_HOSTS', '127.0.0.1:2775')))),
+        'username' => env('JASMIN_SMPP_USERNAME'),
+        'password' => env('JASMIN_SMPP_PASSWORD'),
+        'receiver' => [
+            'reconnect_delay_seconds' => (int) env('JASMIN_SMPP_RECONNECT_DELAY', 5),
+            'max_reconnect_delay_seconds' => (int) env('JASMIN_SMPP_MAX_RECONNECT_DELAY', 60),
+        ],
+    ],
 ];

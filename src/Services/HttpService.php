@@ -7,7 +7,6 @@ use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use RingleSoft\JasminClient\Contracts\JasminHttpContract;
@@ -16,6 +15,7 @@ use RingleSoft\JasminClient\Models\Callbacks\DeliveryCallback;
 use RingleSoft\JasminClient\Models\IncomingMessage;
 use RingleSoft\JasminClient\Models\Responses\JasminResponse;
 use RingleSoft\JasminClient\Validators\HttpMessageValidator;
+use RingleSoft\JasminClient\Utility\Logger;
 
 class HttpService implements JasminHttpContract
 {
@@ -99,17 +99,17 @@ class HttpService implements JasminHttpContract
         $validator = HttpMessageValidator::validate($data);
 
         if ($validator->fails()) {
-            Log::error("JasminClient: Data validation failed for http message");
+            Logger::error('JasminClient: Data validation failed for HTTP message.');
             throw ValidationException::withMessages($validator->errors()->all());
         }
 
         try {
             $response = Http::withHeaders($this->makeHeaders())->post($url, $data);
             if(!$response->ok() && Config::get('jasmin.log_http_failures')){
-                Log::info("HTTP Response failed: " . $response->body());
+                Logger::info('HTTP response failed.', ['body' => $response->body()]);
             }
         } catch (ConnectionException $e) {
-            Log::debug($e);
+            Logger::debug('HTTP connection failed.', ['exception' => $e]);
             throw JasminClientException::from($e);
         }
         return JasminResponse::from($response);
@@ -200,7 +200,7 @@ class HttpService implements JasminHttpContract
 
         $validator = Validator::make($request->input(), $rules);
         if ($validator->fails()) {
-            Log::info("Invalid request received from jasmin");
+            Logger::info('Invalid request received from Jasmin.');
             return new Response("Invalid Request", 400);
         }
         $IncomingMessage = new IncomingMessage(
@@ -229,8 +229,8 @@ class HttpService implements JasminHttpContract
     {
         $validator = Validator::make($request->input(), DeliveryCallback::rules());
         if ($validator->fails()) {
-            Log::info("JasminClient: Invalid request received from jasmin");
-            Log::debug($validator->errors()->all());
+            Logger::info('JasminClient: Invalid request received from Jasmin.');
+            Logger::debug('Jasmin callback validation failed.', ['errors' => $validator->errors()->all()]);
             return new Response("Invalid Request", 400);
         }
         $dlr = new DeliveryCallback(

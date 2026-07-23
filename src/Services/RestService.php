@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use RingleSoft\JasminClient\Contracts\JasminRestContract;
@@ -16,6 +15,7 @@ use RingleSoft\JasminClient\Models\Callbacks\BatchCallback;
 use RingleSoft\JasminClient\Models\Responses\JasminResponse;
 use RingleSoft\JasminClient\Validators\RestBatchValidator;
 use RingleSoft\JasminClient\Validators\RestMessageValidator;
+use RingleSoft\JasminClient\Utility\Logger;
 
 class RestService implements JasminRestContract
 {
@@ -96,13 +96,13 @@ class RestService implements JasminRestContract
         $data = array_filter($data);
         $validator = RestMessageValidator::validate($data);
         if ($validator->fails()) {
-            Log::info("Data validation failed: ");
+            Logger::info('REST message validation failed.');
             throw ValidationException::withMessages($validator->errors()->all());
         }
         try {
             $response = Http::withHeaders($headers)->post($url, $data);
             if(!$response->ok() && Config::get('jasmin.log_http_failures')){
-                Log::info("HTTP Response failed: " . $response->body());
+                Logger::info('REST response failed.', ['body' => $response->body()]);
             }
         } catch (ConnectionException $e) {
             throw JasminClientException::from($e);
@@ -130,14 +130,14 @@ class RestService implements JasminRestContract
 
         $validator = RestBatchValidator::validate($data);
         if ($validator->fails()) {
-            Log::info("Data validation failed: ");
+            Logger::info('REST batch validation failed.');
             throw ValidationException::withMessages($validator->errors()->all());
         }
 
         try {
             $response = Http::withHeaders($this->makeHeaders())->post($url, $data);
         } catch (ConnectionException $e) {
-            Log::debug($e);
+            Logger::debug('REST batch connection failed.', ['exception' => $e]);
             throw JasminClientException::from($e);
         }
         return JasminResponse::from($response);
@@ -199,7 +199,7 @@ class RestService implements JasminRestContract
     {
         $validator = Validator::make($request->input(), BatchCallback::rules());
         if ($validator->fails()) {
-            Log::info("Invalid request received from jasmin");
+            Logger::info('Invalid request received from Jasmin.');
             return new Response("Invalid Request", 400);
         }
         $batchCallback = new BatchCallback(

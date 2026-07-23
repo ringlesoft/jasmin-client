@@ -2,116 +2,83 @@
 
 namespace RingleSoft\JasminClient\Services;
 
-use Exception;
 use Illuminate\Support\Facades\Config;
-use PhpSmpp\Pdu\DeliverReceiptSm;
-use PhpSmpp\Pdu\Pdu;
-use PhpSmpp\Pdu\Sm;
-use PhpSmpp\Pdu\Ussd;
-use PhpSmpp\Service\Listener;
-use PhpSmpp\Service\Sender;
-use PhpSmpp\Service\Service;
-use PhpSmpp\SMPP;
 use RingleSoft\JasminClient\Contracts\JasminSmppContract;
+use RingleSoft\JasminClient\Contracts\SmppTransport;
 use RingleSoft\JasminClient\Exceptions\JasminClientException;
+use RingleSoft\JasminClient\Models\Jasmin\SentMessage;
+use RingleSoft\JasminClient\Services\Transports\PhpSmppTransport;
 use Throwable;
 
 class SmppService implements JasminSmppContract
 {
+    private SmppTransport $transport;
 
-    public Service $senderService;
-    public Service $listenerService;
-    private string $url;
-    private string $username;
-    private string $password;
-    public function __construct(?string $username = null, ?string $password = null, ?string $url = null)
-    {
-        $this->url = $url ?? Config::get('jasmin_client.smpp_url');
-        $this->username = $username ?? Config::get('jasmin_client.username');
-        $this->password = $password ?? Config::get('jasmin_client.password');
-        $this->senderService =  new Sender([$this->url], $this->username, $this->password, null);
-        $this->listenerService = new Listener([$this->url], $this->username, $this->password, null);
+    /**
+     * @param array<string>|string|null $hosts
+     * @throws JasminClientException
+     */
+    public function __construct(
+        ?string $username = null,
+        ?string $password = null,
+        array|string|null $hosts = null,
+        ?SmppTransport $transport = null,
+    ) {
+        $config = Config::get('jasmin_client.smpp', []);
+        $configuredHosts = $config['hosts'] ?? [];
+        $resolvedHosts = $this->normalizeHosts($hosts ?? $configuredHosts);
+        $resolvedUsername = $username ?? ($config['username'] ?? null);
+        $resolvedPassword = $password ?? ($config['password'] ?? null);
+
+        if ($resolvedUsername === null || $resolvedUsername === '' || $resolvedPassword === null || $resolvedPassword === '') {
+            throw new JasminClientException('SMPP credentials must be configured.');
+        }
+
+        $this->transport = $transport ?? new PhpSmppTransport($resolvedHosts, $resolvedUsername, $resolvedPassword);
     }
 
     /**
-     * @throws Throwable
+     * @param string $to
+     * @param string $content
+     * @param string $from
+     * @return SentMessage
      * @throws JasminClientException
      */
-    public function sendMessage(string $to, string $content, string $from): string
+    public function sendMessage(string $to, string $content, string $from): SentMessage
     {
+        if ($to === '' || $content === '' || $from === '') {
+            throw new JasminClientException('SMPP recipient, content, and sender are required.');
+        }
+
         try {
-            return $this->senderService->send(79001001010, 'Hello world!', 'Sender');
-        } catch (Exception $e) {
-            throw JasminClientException::from($e);
+            $messageIds = (array) $this->transport->send($to, $content, $from);
+            $messageIds = array_values(array_filter($messageIds, static fn (mixed $id): bool => is_string($id) && $id !== ''));
+
+            if ($messageIds === []) {
+                throw new JasminClientException('SMPP server did not return a message ID.');
+            }
+            return new SentMessage('Success', $messageIds[0], $messageIds);
+        } catch (JasminClientException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            throw JasminClientException::from($exception, 'Unable to send SMPP message.');
         }
     }
-
-
-    public function receiveMessage(): ?Sm
-    {
-        $this->listenerService->listen(function (Sm $sm) {
-//            var_dump($sm->msgId);
-            if ($sm instanceof DeliverReceiptSm) {
-//                var_dump($sm->state);
-//                var_dump($sm->state === SMPP::STATE_DELIVERED);
-                REturn $sm;
-            } else {
-                echo 'not message';
-                return null;
-            }
-        });
-        return null;
-    }
-
-    public function receiveDeliveryReport(): ?Sm
-    {
-        $this->listenerService->listen(function (Sm $sm) {
-//            var_dump($sm->msgId);
-            if ($sm instanceof DeliverReceiptSm) {
-//                var_dump($sm->state);
-//                var_dump($sm->state === SMPP::STATE_DELIVERED);
-                return $sm;
-            } else {
-                echo 'not message';
-                return null;
-            }
-        });
-        return null;
-    }
-
-
-
-
 
     /**
-     * @throws Throwable
+     * @param array<string>|string $hosts
+     * @return array<string>
      * @throws JasminClientException
      */
-    public function sendUssd(string $to, string $content, string $from): string
+    private function normalizeHosts(array|string $hosts): array
     {
-        try {
-            return $this->senderService->sendUSSD($to, $content, $from, []);
-        } catch (Exception $e) {
-            throw JasminClientException::from($e);
+        $hosts = is_array($hosts) ? $hosts : explode(',', $hosts);
+        $hosts = array_values(array_filter(array_map('trim', $hosts)));
+
+        if ($hosts === [] || array_filter($hosts, static fn (string $host): bool => str_contains($host, '://') || !str_contains($host, ':'))) {
+            throw new JasminClientException('SMPP hosts must use the host:port format, for example 127.0.0.1:2775.');
         }
+
+        return $hosts;
     }
-
-
-    public function receiveUssd(): ?Ussd {
-        $this->listenerService->listen(function (Pdu $pdu) {
-//            var_dump($pdu->id);
-//            var_dump($pdu->sequence);
-            if ($pdu instanceof Ussd) {
-//                var_dump($pdu->status);
-//                var_dump($pdu->source->value);
-//                var_dump($pdu->destination->value);
-//                var_dump($pdu->message);
-                // do some job with ussd
-                return $pdu;
-            }
-        });
-        return null;
-    }
-
-
 }

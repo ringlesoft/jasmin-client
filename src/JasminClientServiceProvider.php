@@ -3,6 +3,7 @@
 namespace RingleSoft\JasminClient;
 
 use Illuminate\Support\ServiceProvider;
+use RingleSoft\JasminClient\Console\ListenSmppCommand;
 
 class JasminClientServiceProvider extends ServiceProvider
 {
@@ -23,7 +24,7 @@ class JasminClientServiceProvider extends ServiceProvider
         );
 
         if ($this->app->runningInConsole()) {
-//            $this->commands([]);
+            $this->commands([ListenSmppCommand::class]);
         }
     }
 

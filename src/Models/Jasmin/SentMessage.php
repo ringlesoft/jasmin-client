@@ -10,11 +10,17 @@ class SentMessage
 {
     public string $messageId;
     public string $status;
+    /** @var array<string> */
+    public array $messageIds;
 
-    public function __construct(?string $status = null, ?string $messageId = null)
+    /**
+     * @param array<string> $messageIds
+     */
+    public function __construct(?string $status = null, ?string $messageId = null, array $messageIds = [])
     {
-        $this->status = $status;
-        $this->messageId = $messageId;
+        $this->status = $status ?? '';
+        $this->messageId = $messageId ?? '';
+        $this->messageIds = ($messageIds === []) ? (($this->messageId === '') ? [] : [$this->messageId]) : $messageIds;
     }
 
     /**
