@@ -21,5 +21,9 @@ return [
         'hosts' => array_values(array_filter(explode(',', env('JASMIN_SMPP_HOSTS', '127.0.0.1:2775')))),
         'username' => env('JASMIN_SMPP_USERNAME'),
         'password' => env('JASMIN_SMPP_PASSWORD'),
+        'receiver' => [
+            'reconnect_delay_seconds' => (int) env('JASMIN_SMPP_RECONNECT_DELAY', 5),
+            'max_reconnect_delay_seconds' => (int) env('JASMIN_SMPP_MAX_RECONNECT_DELAY', 60),
+        ],
     ],
 ];
