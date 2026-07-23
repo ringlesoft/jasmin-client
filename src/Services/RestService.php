@@ -121,6 +121,7 @@ class RestService implements JasminRestContract
      */
     public function sendBatch(array $messages, ?array $globals, ?array $batchConfig, ?bool $asBinary = false): JasminResponse
     {
+        $headers = $this->makeHeaders();
         $url = $this->url . '/secure/sendbatch';
         $data = [
             "messages" => $messages,
@@ -135,7 +136,11 @@ class RestService implements JasminRestContract
         }
 
         try {
-            $response = Http::withHeaders($this->makeHeaders())->post($url, $data);
+            Logger::info("Sending Batch to ". $url);
+            Logger::info("Headers", $headers);
+            Logger::info("Data", $data);
+            $response = Http::withHeaders($headers)->post($url, $data);
+            Logger::info("------------------------");
         } catch (ConnectionException $e) {
             Logger::debug('REST batch connection failed.', ['exception' => $e]);
             throw JasminClientException::from($e);
